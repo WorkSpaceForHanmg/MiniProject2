@@ -1,0 +1,35 @@
+spring:
+  application:
+    name: MySpringBootApp
+  profiles:
+    active: prod
+  boot:
+    admin:
+      client:
+        url: http://localhost:8090
+
+server:
+  port: 8085
+
+myboot:
+  name: Spring
+  age: ${random.int(1,100)}
+  fullName: ${myboot.name} Boot
+
+logging:
+  level:
+    root: info  # 전체 기본 로그 레벨은 info
+    com.devdiary: debug  # 프로젝트의 패키지 로깅만 debug로 상세하게
+  file:
+    path: logs  # 로그 파일 저장 경로 (logs 폴더 자동 생성됨)
+    name: devdiary.log  # 저장될 파일 이름
+  pattern:
+    console: "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} %-5level %logger{36} - %msg%n"
+
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
