@@ -1,0 +1,35 @@
+.container {
+  padding: 20px;
+}
+
+.backBtn {
+  margin-bottom: 10px;
+}
+
+.layout {
+  display: flex;
+}
+
+.sidebar {
+  width: 200px;
+  border-right: 1px solid #ccc;
+}
+
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+}
+
+.sidebar li {
+  cursor: pointer;
+  padding: 8px;
+}
+
+.activeDate {
+  background-color: #e0f0ff;
+}
+
+.content {
+  padding-left: 20px;
+  flex-grow: 1;
+}
