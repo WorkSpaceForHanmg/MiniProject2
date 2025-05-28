@@ -1,6 +1,6 @@
 package com.basic.myspringbootapp.service;
 
-import com.basic.myspringbootapp.domain.Project;
+import com.basic.myspringbootapp.entity.Project;
 import com.basic.myspringbootapp.repository.ProjectRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

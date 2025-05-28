@@ -1,6 +1,6 @@
 package com.basic.myspringbootapp.repository;
 
-import com.basic.myspringbootapp.domain.Tag;
+import com.basic.myspringbootapp.entity.Tag;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

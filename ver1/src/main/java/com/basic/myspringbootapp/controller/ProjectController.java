@@ -1,7 +1,7 @@
 package com.basic.myspringbootapp.controller;
 
-import com.basic.myspringbootapp.controller.dto.ProjectDTO;
-import com.basic.myspringbootapp.domain.Project;
+import com.basic.myspringbootapp.dto.ProjectDTO;
+import com.basic.myspringbootapp.entity.Project;
 import com.basic.myspringbootapp.mapper.ProjectMapper;
 import com.basic.myspringbootapp.service.ProjectService;
 import jakarta.validation.Valid;

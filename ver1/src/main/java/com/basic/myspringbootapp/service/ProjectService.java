@@ -1,6 +1,6 @@
 package com.basic.myspringbootapp.service;
 
-import com.basic.myspringbootapp.domain.Project;
+import com.basic.myspringbootapp.entity.Project;
 import java.util.List;
 
 public interface ProjectService {

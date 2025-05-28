@@ -1,4 +1,4 @@
-package com.basic.myspringbootapp.domain;
+package com.basic.myspringbootapp.entity;
 
 import jakarta.persistence.*;
 import lombok.*;

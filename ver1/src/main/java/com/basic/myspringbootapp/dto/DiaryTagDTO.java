@@ -1,7 +1,5 @@
-package com.basic.myspringbootapp.controller.dto;
+package com.basic.myspringbootapp.dto;
 
-import com.basic.myspringbootapp.controller.dto.DiaryDTO;
-import com.basic.myspringbootapp.controller.dto.TagDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

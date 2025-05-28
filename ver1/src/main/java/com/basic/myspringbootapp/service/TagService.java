@@ -1,6 +1,6 @@
 package com.basic.myspringbootapp.service;
 
-import com.basic.myspringbootapp.domain.Tag;
+import com.basic.myspringbootapp.entity.Tag;
 import com.basic.myspringbootapp.repository.TagRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;

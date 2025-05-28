@@ -1,9 +1,9 @@
 package com.basic.myspringbootapp.mapper;
 
-import com.basic.myspringbootapp.controller.dto.DiaryDTO;
-import com.basic.myspringbootapp.controller.dto.ProjectDTO;
-import com.basic.myspringbootapp.domain.Diary;
-import com.basic.myspringbootapp.domain.Project;
+import com.basic.myspringbootapp.dto.DiaryDTO;
+import com.basic.myspringbootapp.dto.ProjectDTO;
+import com.basic.myspringbootapp.entity.Diary;
+import com.basic.myspringbootapp.entity.Project;
 
 public class DiaryMapper {
 

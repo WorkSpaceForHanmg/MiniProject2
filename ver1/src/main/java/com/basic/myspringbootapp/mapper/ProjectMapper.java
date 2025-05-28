@@ -1,7 +1,7 @@
 package com.basic.myspringbootapp.mapper;
 
-import com.basic.myspringbootapp.controller.dto.ProjectDTO;
-import com.basic.myspringbootapp.domain.Project;
+import com.basic.myspringbootapp.dto.ProjectDTO;
+import com.basic.myspringbootapp.entity.Project;
 
 public class ProjectMapper {
 

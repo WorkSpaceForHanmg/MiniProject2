@@ -1,6 +1,6 @@
 package com.basic.myspringbootapp.repository;
 
-import com.basic.myspringbootapp.domain.Project;
+import com.basic.myspringbootapp.entity.Project;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

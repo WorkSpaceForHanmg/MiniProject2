@@ -1,6 +1,5 @@
-package com.basic.myspringbootapp.controller.dto;
+package com.basic.myspringbootapp.dto;
 
-import com.basic.myspringbootapp.controller.dto.ProjectDTO;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;

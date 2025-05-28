@@ -1,7 +1,7 @@
 package com.basic.myspringbootapp.service;
 
-import com.basic.myspringbootapp.domain.Diary;
-import com.basic.myspringbootapp.domain.Project;
+import com.basic.myspringbootapp.entity.Diary;
+import com.basic.myspringbootapp.entity.Project;
 import com.basic.myspringbootapp.repository.DiaryRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
