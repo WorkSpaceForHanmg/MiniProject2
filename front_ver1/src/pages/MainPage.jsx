@@ -4,29 +4,12 @@ import styles from '../styles/MainPage.module.css';
 const dummyProjects = ['개발 일기 웹앱', '프로젝트 A', '프로젝트 B'];
 const dummyTags = ['React', 'Spring', 'JavaScript'];
 
-const dummyDiaries = [
-  {
-    id: 1,
-    date: '2025-05-26',
-    project: '개발 일기 웹앱',
-    tags: ['React', 'Spring'],
-    summary: '오늘은 일기 폼을 완성함...',
-  },
-  {
-    id: 2,
-    date: '2025-05-25',
-    project: '프로젝트 A',
-    tags: ['JavaScript'],
-    summary: '코드 리팩토링 진행...',
-  },
-];
-
-export default function MainPage({ onViewDetail, onCreateNew }) {
+export default function MainPage({ diaries, onViewDetail, onCreateNew }) {
   const [selectedProject, setSelectedProject] = useState('');
   const [selectedTag, setSelectedTag] = useState('');
   const [selectedDate, setSelectedDate] = useState('');
 
-  const filteredDiaries = dummyDiaries.filter((d) => {
+  const filteredDiaries = diaries.filter((d) => {
     return (
       (selectedProject === '' || d.project === selectedProject) &&
       (selectedTag === '' || d.tags.includes(selectedTag)) &&
@@ -41,30 +24,20 @@ export default function MainPage({ onViewDetail, onCreateNew }) {
       <section className={styles.filtersRow}>
         <div className={styles.filterGroup}>
           <label>프로젝트</label>
-          <select
-            value={selectedProject}
-            onChange={(e) => setSelectedProject(e.target.value)}
-          >
+          <select value={selectedProject} onChange={(e) => setSelectedProject(e.target.value)}>
             <option value="">전체</option>
             {dummyProjects.map((p) => (
-              <option key={p} value={p}>
-                {p}
-              </option>
+              <option key={p} value={p}>{p}</option>
             ))}
           </select>
         </div>
 
         <div className={styles.filterGroup}>
           <label>태그</label>
-          <select
-            value={selectedTag}
-            onChange={(e) => setSelectedTag(e.target.value)}
-          >
+          <select value={selectedTag} onChange={(e) => setSelectedTag(e.target.value)}>
             <option value="">전체</option>
             {dummyTags.map((t) => (
-              <option key={t} value={t}>
-                {t}
-              </option>
+              <option key={t} value={t}>{t}</option>
             ))}
           </select>
         </div>
@@ -83,9 +56,7 @@ export default function MainPage({ onViewDetail, onCreateNew }) {
         {filteredDiaries.length === 0 && <p>조건에 맞는 일기가 없습니다.</p>}
         {filteredDiaries.map((d) => (
           <div key={d.id} className={styles.diaryItem}>
-            <div>
-              <strong>{d.project}</strong> | 태그: {d.tags.join(', ')}
-            </div>
+            <div><strong>{d.project}</strong> | 태그: {d.tags.join(', ')}</div>
             <div>➝ {d.summary}</div>
             <button
               className={styles.detailBtn}

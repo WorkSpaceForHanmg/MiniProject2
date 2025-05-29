@@ -3,7 +3,7 @@ import MainPage from './pages/MainPage';
 import DiaryDetail from './pages/DetailPage';
 import NewDiaryForm from './pages/NewDiaryForm';
 
-const dummyDiaries = [
+const initialDiaries = [
   {
     id: 1,
     date: '2025-05-26',
@@ -24,15 +24,22 @@ const dummyDiaries = [
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState('main');
+  const [diaries, setDiaries] = useState(initialDiaries);
   const [selectedDiaryId, setSelectedDiaryId] = useState(null);
 
-  // 선택한 일기 객체 찾기
-  const selectedDiary = dummyDiaries.find((d) => d.id === selectedDiaryId);
+  const selectedDiary = diaries.find((d) => d.id === selectedDiaryId);
+
+  const handleAddDiary = (newDiary) => {
+    const newId = Date.now(); // 간단한 ID 생성
+    setDiaries((prev) => [...prev, { ...newDiary, id: newId }]);
+    setCurrentPage('main');
+  };
 
   return (
     <>
       {currentPage === 'main' && (
         <MainPage
+          diaries={diaries}
           onViewDetail={(id) => {
             setSelectedDiaryId(id);
             setCurrentPage('detail');
@@ -45,7 +52,12 @@ export default function App() {
         <DiaryDetail diary={selectedDiary} onBack={() => setCurrentPage('main')} />
       )}
 
-      {currentPage === 'new' && <NewDiaryForm onCancel={() => setCurrentPage('main')} />}
+      {currentPage === 'new' && (
+        <NewDiaryForm
+          onCancel={() => setCurrentPage('main')}
+          onSave={handleAddDiary}
+        />
+      )}
     </>
   );
 }
