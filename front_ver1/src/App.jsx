@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import MainPage from './pages/MainPage';
-import DiaryDetail from './pages/DetailPage';
+import DetailPage from './pages/DetailPage';
 import NewDiaryForm from './pages/NewDiaryForm';
 
 const initialDiaries = [
@@ -27,11 +27,20 @@ export default function App() {
   const [diaries, setDiaries] = useState(initialDiaries);
   const [selectedDiaryId, setSelectedDiaryId] = useState(null);
 
-  const selectedDiary = diaries.find((d) => d.id === selectedDiaryId);
-
   const handleAddDiary = (newDiary) => {
-    const newId = Date.now(); // 간단한 ID 생성
+    const newId = Date.now();
     setDiaries((prev) => [...prev, { ...newDiary, id: newId }]);
+    setCurrentPage('main');
+  };
+
+  const handleUpdateDiary = (id, updatedDiary) => {
+    setDiaries((prev) =>
+      prev.map((d) => (d.id === id ? { ...d, ...updatedDiary } : d))
+    );
+  };
+
+  const handleDeleteDiary = (id) => {
+    setDiaries((prev) => prev.filter((d) => d.id !== id));
     setCurrentPage('main');
   };
 
@@ -48,8 +57,15 @@ export default function App() {
         />
       )}
 
-      {currentPage === 'detail' && selectedDiary && (
-        <DiaryDetail diary={selectedDiary} onBack={() => setCurrentPage('main')} />
+      {currentPage === 'detail' && (
+        <DetailPage
+          diaries={diaries}
+          selectedDiaryId={selectedDiaryId}
+          onBack={() => setCurrentPage('main')}
+          onSelectDiary={setSelectedDiaryId}
+          onUpdateDiary={handleUpdateDiary}
+          onDeleteDiary={handleDeleteDiary}
+        />
       )}
 
       {currentPage === 'new' && (
