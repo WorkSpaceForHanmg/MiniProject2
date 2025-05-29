@@ -1,0 +1,26 @@
+myboot:
+  name: Dev Env
+
+spring:
+  datasource:
+    url: jdbc:mariadb://127.0.0.1:3306/boot_db
+    username: Host
+    password: maria
+    driver-class-name: org.mariadb.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update   # dev는 보통 update (create는 데이터 날아감)
+    show-sql: true
+    database-platform: org.hibernate.dialect.MariaDBDialect
+
+logging:
+  level:
+    root: debug
+    com.devdiary: debug
+    org.hibernate.SQL: debug
+    org.hibernate.type.descriptor.sql.BasicBinder: trace
+  file:
+    name: logs/dev.log
+  pattern:
+    console: "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} %-5level %logger{36} - %msg%n"
