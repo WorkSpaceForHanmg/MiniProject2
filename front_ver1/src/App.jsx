@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import MainPage from './pages/MainPage';
 import DetailPage from './pages/DetailPage';
 import NewDiaryForm from './pages/NewDiaryForm';
+import ErrorNote from './pages/ErrorNote';
 
 const initialDiaries = [
   {
@@ -54,6 +55,7 @@ export default function App() {
             setCurrentPage('detail');
           }}
           onCreateNew={() => setCurrentPage('new')}
+          onGoToErrorNote={() => setCurrentPage('errorNote')}
         />
       )}
 
@@ -73,6 +75,10 @@ export default function App() {
           onCancel={() => setCurrentPage('main')}
           onSave={handleAddDiary}
         />
+      )}
+
+      {currentPage == 'errorNote' && (
+        <ErrorNote/>
       )}
     </>
   );

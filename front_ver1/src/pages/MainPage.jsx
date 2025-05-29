@@ -5,7 +5,7 @@ import { Button } from '@mui/material';
 const dummyProjects = ['개발 일기 웹앱', '프로젝트 A', '프로젝트 B'];
 const dummyTags = ['React', 'Spring', 'JavaScript'];
 
-export default function MainPage({ diaries, onViewDetail, onCreateNew }) {
+export default function MainPage({ diaries, onViewDetail, onCreateNew, onGoToErrorNote }) {
   const [selectedProject, setSelectedProject] = useState('');
   const [selectedTag, setSelectedTag] = useState('');
   const [selectedDate, setSelectedDate] = useState('');
@@ -80,7 +80,7 @@ export default function MainPage({ diaries, onViewDetail, onCreateNew }) {
 
         <button
           className={styles.noteBtnFixed}
-          onClick={() => alert('오답노트 페이지로 이동 (구현 예정)')}
+          onClick={onGoToErrorNote}
         >
           오답노트 보러가기
         </button>
