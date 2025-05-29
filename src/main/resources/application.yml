@@ -7,6 +7,11 @@ spring:
     admin:
       client:
         url: http://localhost:8090
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:schema.sql
+      data-locations: classpath:data.sql
 
 server:
   port: 8085

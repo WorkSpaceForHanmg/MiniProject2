@@ -3,15 +3,15 @@ myboot:
 
 spring:
   datasource:
-    url: jdbc:h2:mem:devdb
-    driver-class-name: org.h2.Driver
-    username: sa
-    password:
+    url: jdbc:mariadb://127.0.0.1:3306/boot_db
+    username: Host
+    password: maria
+    driver-class-name: org.mariadb.jdbc.Driver
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: update   # dev는 보통 update (create는 데이터 날아감)
     show-sql: true
-    database-platform: org.hibernate.dialect.H2Dialect
+    database-platform: org.hibernate.dialect.MariaDBDialect
 
 logging:
   level:

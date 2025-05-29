@@ -4,8 +4,8 @@ myboot:
 spring:
   datasource:
     url: jdbc:mariadb://127.0.0.1:3306/boot_db
-    username: boot
-    password: boot
+    username: Host
+    password: maria
     driver-class-name: org.mariadb.jdbc.Driver
   jpa:
     hibernate:
