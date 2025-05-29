@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import styles from '../styles/MainPage.module.css';
 
 const dummyProjects = ['개발 일기 웹앱', '프로젝트 A', '프로젝트 B'];
 const dummyTags = ['React', 'Spring', 'JavaScript'];
 
-export default function MainPage({ diaries, onViewDetail, onCreateNew }) {
+export default function MainPage({ diaries }) {
+  const navigate = useNavigate();
+
   const [selectedProject, setSelectedProject] = useState('');
   const [selectedTag, setSelectedTag] = useState('');
   const [selectedDate, setSelectedDate] = useState('');
@@ -60,7 +63,7 @@ export default function MainPage({ diaries, onViewDetail, onCreateNew }) {
             <div>➝ {d.summary}</div>
             <button
               className={styles.detailBtn}
-              onClick={() => onViewDetail(d.id)}
+              onClick={() => navigate(`/detail/${d.id}`)}
             >
               자세히 보기
             </button>
@@ -76,7 +79,7 @@ export default function MainPage({ diaries, onViewDetail, onCreateNew }) {
       </button>
 
       <div className={styles.newDiaryWrapper}>
-        <button className={styles.newDiaryBtn} onClick={onCreateNew}>
+        <button className={styles.newDiaryBtn} onClick={() => navigate('/new')}>
           + 새 일기 작성
         </button>
       </div>

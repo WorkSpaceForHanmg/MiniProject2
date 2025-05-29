@@ -1,9 +1,14 @@
 #root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+  width: 100vw;       /* 화면 가로 전체 */
+  height: 100vh;      /* 화면 세로 전체 */
+  margin: 0;
+  padding: 0;
+  text-align: left;   /* 필요하면 변경 */
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
 }
+
 
 .logo {
   height: 6em;

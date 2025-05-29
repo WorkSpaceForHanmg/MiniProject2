@@ -1,4 +1,6 @@
+// App.jsx
 import React, { useState } from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import MainPage from './pages/MainPage';
 import DetailPage from './pages/DetailPage';
 import NewDiaryForm from './pages/NewDiaryForm';
@@ -23,14 +25,11 @@ const initialDiaries = [
 ];
 
 export default function App() {
-  const [currentPage, setCurrentPage] = useState('main');
   const [diaries, setDiaries] = useState(initialDiaries);
-  const [selectedDiaryId, setSelectedDiaryId] = useState(null);
 
   const handleAddDiary = (newDiary) => {
     const newId = Date.now();
     setDiaries((prev) => [...prev, { ...newDiary, id: newId }]);
-    setCurrentPage('main');
   };
 
   const handleUpdateDiary = (id, updatedDiary) => {
@@ -41,39 +40,24 @@ export default function App() {
 
   const handleDeleteDiary = (id) => {
     setDiaries((prev) => prev.filter((d) => d.id !== id));
-    setCurrentPage('main');
   };
 
   return (
-    <>
-      {currentPage === 'main' && (
-        <MainPage
-          diaries={diaries}
-          onViewDetail={(id) => {
-            setSelectedDiaryId(id);
-            setCurrentPage('detail');
-          }}
-          onCreateNew={() => setCurrentPage('new')}
+    <Router>
+      <Routes>
+        <Route path="/" element={<MainPage diaries={diaries} />} />
+        <Route
+          path="/detail/:id"
+          element={
+            <DetailPage
+              diaries={diaries}
+              onUpdateDiary={handleUpdateDiary}
+              onDeleteDiary={handleDeleteDiary}
+            />
+          }
         />
-      )}
-
-      {currentPage === 'detail' && (
-        <DetailPage
-          diaries={diaries}
-          selectedDiaryId={selectedDiaryId}
-          onBack={() => setCurrentPage('main')}
-          onSelectDiary={setSelectedDiaryId}
-          onUpdateDiary={handleUpdateDiary}
-          onDeleteDiary={handleDeleteDiary}
-        />
-      )}
-
-      {currentPage === 'new' && (
-        <NewDiaryForm
-          onCancel={() => setCurrentPage('main')}
-          onSave={handleAddDiary}
-        />
-      )}
-    </>
+        <Route path="/new" element={<NewDiaryForm onSave={handleAddDiary} />} />
+      </Routes>
+    </Router>
   );
 }
