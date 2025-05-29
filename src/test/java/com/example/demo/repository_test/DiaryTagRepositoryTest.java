@@ -69,3 +69,4 @@ class DiaryTagRepositoryTest {
         assertThat(result.get(0).getDiary().getDevfeel()).isEqualTo("기분 좋음");
     }
 }
+//1

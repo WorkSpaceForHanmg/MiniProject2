@@ -7,3 +7,4 @@ CREATE TABLE IF NOT EXISTS project (
     id BIGINT PRIMARY KEY,
     name VARCHAR(255) NOT NULL
 );
+--주석

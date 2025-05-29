@@ -26,3 +26,4 @@ public class DiaryTag {
     @JoinColumn(name = "tid", nullable = false)
     private Tag tag;
 }
+//a

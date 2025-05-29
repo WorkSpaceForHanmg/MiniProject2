@@ -11,3 +11,4 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
     // 프로젝트 이름으로 조회
     Optional<Project> findByName(String name);
 }
+//a

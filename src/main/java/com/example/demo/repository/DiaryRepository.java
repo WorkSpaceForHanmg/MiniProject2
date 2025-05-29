@@ -16,3 +16,4 @@ public interface DiaryRepository extends JpaRepository<Diary, Long> {
     // 특정 날짜 범위 내 일기 조회
     List<Diary> findByDateBetween(LocalDate startDate, LocalDate endDate);
 }
+//a

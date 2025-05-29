@@ -17,3 +17,4 @@ public class DBCheckRunner implements CommandLineRunner {
         System.out.println("DB 연결 확인 결과: " + result);
     }
 }
+//a
