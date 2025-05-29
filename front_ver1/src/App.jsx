@@ -78,7 +78,7 @@ export default function App() {
       )}
 
       {currentPage == 'errorNote' && (
-        <ErrorNote/>
+        <ErrorNote onBack={() => setCurrentPage('main')} />
       )}
     </>
   );

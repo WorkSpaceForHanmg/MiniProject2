@@ -20,13 +20,17 @@ const dummyData = [
   },
 ];
 
-export default function ErrorNote() {
+export default function ErrorNote({onBack}) {
   const [selectedTag, setSelectedTag] = useState('Spring');
 
   const filtered = dummyData.filter((d) => d.tags.includes(selectedTag));
 
   return (
     <div className={styles.container}>
+      <button className = {styles.backBtn} onClick={onBack}>
+        ←뒤로가기
+      </button>
+
       <div className={styles.filterSection}>
         <label htmlFor="tag-select">태그</label>
         <div className={styles.tagInputGroup}>
