@@ -62,7 +62,9 @@ export default function DetailPage({
   return (
     <div className={styles.detailContainer}>
       <header className={styles.detailHeader}>
-        <button className={styles.backBtn} onClick={onBack}>← 뒤로가기</button>
+        <button className={styles.backBtn} onClick={onBack}>
+          ← 뒤로가기
+        </button>
         <h2>일기 상세 보기</h2>
       </header>
 

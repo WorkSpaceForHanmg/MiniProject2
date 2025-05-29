@@ -1,9 +1,13 @@
+
 .container {
-  max-width: 720px;
+  width: 600px;
   margin: 2rem auto;
-  padding: 0 1rem;
+  padding: 24px;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   color: #333;
+  margin-left: 450px;
+  border: 1px dashed #aaa;
+  border-radius: 8px;
 }
 
 .header {
@@ -26,7 +30,7 @@
 .filterGroup {
   display: flex;
   flex-direction: column;
-  width: 45%;
+  width: 30%;
 }
 
 .filterGroup label {
@@ -91,9 +95,10 @@
 }
 
 .newDiaryBtn {
-  background-color: #28a745;
+  background-color: #007bff;
   color: white;
   border: none;
+  width: 100%;
   padding: 0.6rem 1.2rem;
   font-size: 1rem;
   border-radius: 5px;
@@ -102,7 +107,7 @@
 }
 
 .newDiaryBtn:hover {
-  background-color: #1e7e34;
+  background-color: #005bac;
 }
 
 /* 우하단 고정 버튼 스타일 */

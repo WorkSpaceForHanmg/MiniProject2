@@ -43,7 +43,7 @@ ${errors}
     <div className={styles.newDiaryContainer}>
       <header className={styles.newDiaryHeader}>
         <button className={styles.backBtn} onClick={onCancel}>
-          ← 뒤로가기
+          ←뒤로가기
         </button>
         <h2>새 일기 작성</h2>
       </header>
