@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import styles from '../styles/NewDiaryForm.module.css';
 
 const dummyProjects = ['개발 일기 웹앱', '프로젝트 A', '프로젝트 B'];
-const dummyTags = ['React', 'Spring', 'JavaScript'];
+const dummyTags = ['React', 'Spring', 'JavaScript', 'SQL', 'JAVA'];
 
 export default function NewDiaryForm({ onCancel, onSave }) {
   const [date, setDate] = useState('');
@@ -11,7 +11,11 @@ export default function NewDiaryForm({ onCancel, onSave }) {
   const [code, setCode] = useState('');
   const [devReview, setDevReview] = useState('');
   const [challenges, setChallenges] = useState('');
-  const [errors, setErrors] = useState('');
+
+  // 추가된 에러 관련 상태
+  const [errorSummary, setErrorSummary] = useState('');
+  const [errorTags, setErrorTags] = useState('');
+  const [errorSolution, setErrorSolution] = useState('');
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -31,8 +35,14 @@ ${devReview}
 [어려웠던 점]
 ${challenges}
 
-[에러 해결]
-${errors}
+[에러 요약]
+${errorSummary}
+
+[에러 태그]
+${errorTags}
+
+[해결 방법]
+${errorSolution}
       `.trim(),
     };
 
@@ -102,10 +112,41 @@ ${errors}
           <textarea rows={4} value={challenges} onChange={(e) => setChallenges(e.target.value)} />
         </label>
 
-        <label>
-          에러 발생 및 해결 방법:
-          <textarea rows={4} value={errors} onChange={(e) => setErrors(e.target.value)} />
-        </label>
+        {/* 🔽 에러 관련 입력 필드 분리 */}
+        <fieldset className={styles.errorSection}>
+          <legend>에러 및 해결</legend>
+
+          <label>
+            에러 한 줄 요약:
+            <input
+              type="text"
+              value={errorSummary}
+              onChange={(e) => setErrorSummary(e.target.value)}
+              placeholder="예: useState 초기화 오류"
+            />
+          </label>
+
+          <label>
+            에러 태그 (콤마로 구분):
+            <input
+              type="text"
+              list="tag-list"
+              value={errorTags}
+              onChange={(e) => setErrorTags(e.target.value)}
+              placeholder="예: React, Hook"
+            />
+          </label>
+
+          <label>
+            해결 방법:
+            <textarea
+              rows={4}
+              value={errorSolution}
+              onChange={(e) => setErrorSolution(e.target.value)}
+              placeholder="해결한 방법을 간단히 작성"
+            />
+          </label>
+        </fieldset>
 
         <div className={styles.formBtnGroup}>
           <button type="submit" className={styles.saveBtn}>저장</button>
