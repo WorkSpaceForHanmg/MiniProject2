@@ -1,19 +1,19 @@
 package com.example.demo.mapper;
 
 import com.example.demo.DTO.DiaryDTO;
-import com.example.demo.DTO.ProjectDTO;
 import com.example.demo.entity.Diary;
 import com.example.demo.entity.Project;
+import com.example.demo.entity.Tag;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class DiaryMapper {
 
-    // DTO → Entity 변환
     public static Diary dtoToEntity(DiaryDTO.Request dto, Project project) {
-        if (dto == null || project == null) return null;
-
         return Diary.builder()
                 .date(dto.getDate())
-                .devfeel(dto.getTitle())  // title → devfeel
+                .devfeel(dto.getTitle())
                 .diff(dto.getDiff())
                 .error(dto.getError())
                 .explaination(dto.getContent())
@@ -21,35 +21,24 @@ public class DiaryMapper {
                 .build();
     }
 
-    // Entity → DTO 변환
-    public static DiaryDTO.Response entityToDto(Diary entity) {
-        if (entity == null) return null;
-
-        ProjectDTO.SimpleResponse projectDto = ProjectDTO.SimpleResponse.builder()
-                .pid(entity.getProject().getPid())
-                .name(entity.getProject().getName())
-                .build();
+    public static DiaryDTO.Response entityToDto(Diary diary) {
+        Project project = diary.getProject();
 
         return DiaryDTO.Response.builder()
-                .did(entity.getDid())
-                .date(entity.getDate())
-                .title(entity.getDevfeel())
-                .diff(entity.getDiff())
-                .error(entity.getError())
-                .content(entity.getExplaination())
-                .project(projectDto)
-                .build();
-    }
-
-    // Entity → 간단 DTO 변환
-    public static DiaryDTO.SimpleResponse entityToSimpleDto(Diary entity) {
-        if (entity == null) return null;
-
-        return DiaryDTO.SimpleResponse.builder()
-                .did(entity.getDid())
-                .date(entity.getDate())
-                .title(entity.getDevfeel())
+                .did(diary.getDid())
+                .date(diary.getDate().toString())
+                .title(diary.getDevfeel())
+                .diff(diary.getDiff())
+                .error(diary.getError())
+                .content(diary.getExplaination())
+                .projectId(project != null ? project.getPid() : null)
+                .projectName(project != null ? project.getName() : null)
+                .tags(diary.getTags() != null
+                        ? diary.getTags().stream()
+                        .map(Tag::getName)
+                        .collect(Collectors.toList())
+                        : List.of()
+                )
                 .build();
     }
 }
-//a

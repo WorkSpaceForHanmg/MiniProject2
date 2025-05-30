@@ -1,9 +1,11 @@
 package com.example.demo.Service;
 
+import com.example.demo.entity.Diary;
 import com.example.demo.entity.DiaryTag;
 import com.example.demo.entity.Tag;
 import com.example.demo.repository.DiaryTagRepository;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -11,13 +13,10 @@ import java.util.Optional;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class DiaryTagService {
 
     private final DiaryTagRepository diaryTagRepository;
-
-    public DiaryTagService(DiaryTagRepository diaryTagRepository) {
-        this.diaryTagRepository = diaryTagRepository;
-    }
 
     // 전체 DiaryTag 조회
     public List<DiaryTag> findAllDiaryTags() {
@@ -43,5 +42,17 @@ public class DiaryTagService {
     public void deleteDiaryTag(Long dtid) {
         diaryTagRepository.deleteById(dtid);
     }
+
+    // 다이어리에 태그 연결하는 핵심 메서드
+    public void connectTagsToDiary(Diary diary, List<Tag> tags) {
+        List<DiaryTag> diaryTags = tags.stream()
+                .map(tag -> DiaryTag.builder()
+                        .diary(diary)
+                        .tag(tag)
+                        .build())
+                .toList();
+
+        diary.getDiaryTags().clear();
+        diary.getDiaryTags().addAll(diaryTags);
+    }
 }
-//a

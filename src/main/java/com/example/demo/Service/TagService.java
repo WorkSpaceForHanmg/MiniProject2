@@ -39,5 +39,14 @@ public class TagService {
     public void deleteTag(Long tid) {
         tagRepository.deleteById(tid);
     }
+
+    // 태그 이름 리스트 → 존재하면 가져오고, 없으면 생성
+    @Transactional
+    public List<Tag> getOrCreateTagsByName(List<String> tagNames) {
+        return tagNames.stream()
+                .map(name -> tagRepository.findByName(name)
+                        .orElseGet(() -> tagRepository.save(Tag.builder().name(name).build()))
+                )
+                .toList();
+    }
 }
-//a

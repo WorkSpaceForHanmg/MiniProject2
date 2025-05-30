@@ -1,84 +1,38 @@
 package com.example.demo.DTO;
 
-import com.example.demo.entity.Diary;
-import com.example.demo.entity.Project;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.List;
 
 public class DiaryDTO {
 
-    @Data
+    @Getter
+    @Setter
     @NoArgsConstructor
     @AllArgsConstructor
-    @Builder
     public static class Request {
-        @NotNull(message = "날짜는 필수입니다.")
         private LocalDate date;
-
-        @NotBlank(message = "개발 소감은 필수입니다.")
-        private String title;  // devfeel
-
-        private String diff;   // 어려웠던 점
-        private String error;  // 에러 사항 및 대처방안
-        private String content; // 코드 설명 (explain)
-
-        @NotNull(message = "프로젝트 정보는 필수입니다.")
-        private Long projectId;
-
-        //DTO → Entity
-        public Diary toEntity(Project project) {
-            return Diary.builder()
-                    .date(this.date)
-                    .devfeel(this.title)
-                    .diff(this.diff)
-                    .error(this.error)
-                    .explaination(this.content)
-                    .project(project)
-                    .build();
-        }
+        private String title;         // summary
+        private String diff;
+        private String error;
+        private String content;       // explanation
+        private Long projectId;       // 선택된 프로젝트 ID
+        private List<String> tags;    // 태그 이름 리스트 (선택사항)
     }
 
-    @Data
-    @NoArgsConstructor
-    @AllArgsConstructor
+    @Getter
     @Builder
+    @AllArgsConstructor
     public static class Response {
         private Long did;
-        private LocalDate date;
+        private String date;
         private String title;
         private String diff;
         private String error;
         private String content;
-        private ProjectDTO.SimpleResponse project;
-
-        //Entity → DTO
-        public static Response fromEntity(Diary diary) {
-            return Response.builder()
-                    .did(diary.getDid())
-                    .date(diary.getDate())
-                    .title(diary.getDevfeel())
-                    .diff(diary.getDiff())
-                    .error(diary.getError())
-                    .content(diary.getExplaination())
-                    .project(ProjectDTO.SimpleResponse.builder()
-                            .pid(diary.getProject().getPid())
-                            .name(diary.getProject().getName())
-                            .build())
-                    .build();
-        }
-    }
-
-    @Data
-    @NoArgsConstructor
-    @AllArgsConstructor
-    @Builder
-    public static class SimpleResponse {
-        private Long did;
-        private LocalDate date;
-        private String title;
+        private Long projectId;
+        private String projectName;
+        private List<String> tags;    // 태그 이름 리스트 (선택사항)
     }
 }
-//a
