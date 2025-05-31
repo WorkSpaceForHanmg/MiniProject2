@@ -13,12 +13,12 @@ public class DiaryDTO {
     @AllArgsConstructor
     public static class Request {
         private LocalDate date;
-        private String title;         // summary
+        private String title;
         private String diff;
         private String error;
-        private String content;       // explanation
-        private Long projectId;       // 선택된 프로젝트 ID
-        private List<String> tags;    // 태그 이름 리스트 (선택사항)
+        private String content;
+        private Long projectId;
+        private List<String> tags;
     }
 
     @Getter
@@ -33,6 +33,16 @@ public class DiaryDTO {
         private String content;
         private Long projectId;
         private String projectName;
-        private List<String> tags;    // 태그 이름 리스트 (선택사항)
+        private List<String> tags;
+    }
+
+    //  검색했을 때 검색결과를 간단하게 보여주는 DTO
+    @Getter
+    @Builder
+    @AllArgsConstructor
+    public static class SimpleResponse {
+        private Long did;
+        private String date;
+        private String title;
     }
 }
