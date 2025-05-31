@@ -1,12 +1,21 @@
 spring:
   application:
     name: MySpringBootApp
+
   profiles:
     active: prod
+
+  datasource:
+    url: jdbc:mariadb://127.0.0.1:3306/boot_db
+    username: root
+    password: maria
+
+    driver-class-name: org.mariadb.jdbc.Driver
   boot:
     admin:
       client:
         url: http://localhost:8090
+
   sql:
     init:
       mode: always
@@ -23,19 +32,17 @@ myboot:
 
 logging:
   level:
-    root: info  # 전체 기본 로그 레벨은 info
-    com.devdiary: debug  # 프로젝트의 패키지 로깅만 debug로 상세하게
+    root: info
+    com.devdiary: debug
   file:
-    path: logs  # 로그 파일 저장 경로 (logs 폴더 자동 생성됨)
-    name: devdiary.log  # 저장될 파일 이름
+    path: logs
+    name: devdiary.log
   pattern:
     console: "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
     file: "%d{yyyy-MM-dd HH:mm:ss} %-5level %logger{36} - %msg%n"
-
 
 management:
   endpoints:
     web:
       exposure:
         include: "*"
-#a

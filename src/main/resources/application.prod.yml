@@ -4,12 +4,19 @@ myboot:
 spring:
   datasource:
     url: jdbc:mariadb://127.0.0.1:3306/boot_db
-    username: Host
+    username: root
     password: maria
     driver-class-name: org.mariadb.jdbc.Driver
+
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:schema.sql
+      data-locations: classpath:data.sql
+
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: none
     show-sql: true
     database-platform: org.hibernate.dialect.MariaDBDialect
 

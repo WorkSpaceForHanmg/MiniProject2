@@ -11,7 +11,7 @@ public class DiaryTagMapper {
             .dtid(entity.getDtid())
             .diary(DiaryDTO.SimpleResponse.builder()
                    .did(entity.getDiary().getDid())
-                   .date(entity.getDiary().getDate())
+                   .date(entity.getDiary().getDate().toString())
                    .title(entity.getDiary().getDevfeel())
                    .build())
             .tag(TagDTO.SimpleResponse.builder()
