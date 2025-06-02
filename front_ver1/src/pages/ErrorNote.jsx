@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import styles from '../styles/ErrorNote.module.css';
 
 const dummyData = [
@@ -30,7 +31,8 @@ const dummyData = [
 
 const allTags = ['Spring', 'JAVA', 'React', 'JavaScript', 'SQL'];
 
-export default function ErrorNote({ onBack }) {
+export default function ErrorNote() {
+  const navigate = useNavigate();
   const [selectedTag, setSelectedTag] = useState('');
 
   const filtered = selectedTag
@@ -39,7 +41,7 @@ export default function ErrorNote({ onBack }) {
 
   return (
     <div className={styles.container}>
-      <button className={styles.backBtn} onClick={onBack}>
+      <button className={styles.backBtn} onClick={() => navigate(-1)}>
         ← 뒤로가기
       </button>
 
@@ -66,7 +68,22 @@ export default function ErrorNote({ onBack }) {
         <div className={styles.errorList}>
           {filtered.map((item) => (
             <div key={item.id} className={styles.errorCard}>
-              <a href="#" className={styles.errorLink}>{item.title}</a>
+              <button
+                className={styles.errorLink}
+                onClick={() => navigate(`/diary/${item.id}`)}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  padding: 0,
+                  color: 'blue',
+                  textDecoration: 'underline',
+                  cursor: 'pointer',
+                  fontSize: 'inherit',
+                  fontFamily: 'inherit',
+                }}
+              >
+                {item.title}
+              </button>
               <p className={styles.errorDesc}>{item.description}</p>
               <div className={styles.errorMeta}>
                 <span>{item.project}</span>
