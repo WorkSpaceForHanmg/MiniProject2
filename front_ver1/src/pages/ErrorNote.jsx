@@ -1,43 +1,18 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useDiary } from '../context/DiaryContext';
 import styles from '../styles/ErrorNote.module.css';
-
-const dummyData = [
-  {
-    id: 1,
-    title: '오류1_발생 → 해결',
-    description: '스프링에서 의존성 주입이 안 되는 오류',
-    project: '프로젝트 1',
-    date: '2025년 4월 20일',
-    tags: ['Spring', 'JAVA'],
-  },
-  {
-    id: 2,
-    title: '오류2_발생 → 해결',
-    description: 'useState 초기값 설정 오류',
-    project: '프로젝트 2',
-    date: '2025년 4월 23일',
-    tags: ['React', 'JavaScript'],
-  },
-  {
-    id: 3,
-    title: '오류3_발생 → 해결',
-    description: 'SQL 구문 오류 (문법 에러)',
-    project: '프로젝트 3',
-    date: '2025년 5월 1일',
-    tags: ['SQL'],
-  },
-];
-
-const allTags = ['Spring', 'JAVA', 'React', 'JavaScript', 'SQL'];
 
 export default function ErrorNote() {
   const navigate = useNavigate();
-  const [selectedTag, setSelectedTag] = useState('');
+  const { diaries, tags } = useDiary();
+  const [selectedTag, setSelectedTag] = useState('all');
 
-  const filtered = selectedTag
-    ? dummyData.filter((d) => d.tags.includes(selectedTag))
-    : [];
+  // 선택한 태그가 'all'이면 모든 diaries 보여주고, 아니면 필터링
+  const filteredDiaries =
+    selectedTag === 'all'
+      ? diaries
+      : diaries.filter((d) => d.tags && d.tags.includes(selectedTag));
 
   return (
     <div className={styles.container}>
@@ -53,24 +28,27 @@ export default function ErrorNote() {
           onChange={(e) => setSelectedTag(e.target.value)}
           className={styles.selectBox}
         >
-          <option value="">태그 선택</option>
-          {allTags.map((tag) => (
-            <option key={tag} value={tag}>{tag}</option>
+          <option value="all">전체보기</option>
+          {tags.map((tag) => (
+            <option key={tag} value={tag}>
+              {tag}
+            </option>
           ))}
         </select>
       </div>
 
       <h2 className={styles.errorTitle}>ERRORS</h2>
 
-      {filtered.length === 0 ? (
+      {filteredDiaries.length === 0 ? (
         <p className={styles.emptyText}>조건에 맞는 오류가 없습니다.</p>
       ) : (
         <div className={styles.errorList}>
-          {filtered.map((item) => (
+          {filteredDiaries.map((item) => (
             <div key={item.id} className={styles.errorCard}>
               <button
                 className={styles.errorLink}
                 onClick={() => navigate(`/diary/${item.id}`)}
+                // 가능하면 인라인 스타일 대신 css로 관리하는 게 좋음
                 style={{
                   background: 'none',
                   border: 'none',
@@ -81,18 +59,27 @@ export default function ErrorNote() {
                   fontSize: 'inherit',
                   fontFamily: 'inherit',
                 }}
+                aria-label={`일기 ${item.title || item.id} 상세보기`}
               >
-                {item.title}
+                {item.title || `일기 ${item.id}`}
               </button>
-              <p className={styles.errorDesc}>{item.description}</p>
+              <p className={styles.errorDesc}>
+                {item.description || item.summary || '설명이 없습니다.'}
+              </p>
               <div className={styles.errorMeta}>
-                <span>{item.project}</span>
-                <span>{item.date}</span>
+                <span>{item.project || '프로젝트 정보 없음'}</span>
+                <span>{item.date || '날짜 정보 없음'}</span>
               </div>
               <div className={styles.tagList}>
-                {item.tags.map((tag) => (
-                  <span key={tag} className={styles.tag}>{tag}</span>
-                ))}
+                {item.tags && item.tags.length > 0 ? (
+                  item.tags.map((tag) => (
+                    <span key={tag} className={styles.tag}>
+                      {tag}
+                    </span>
+                  ))
+                ) : (
+                  <span className={styles.noTag}>태그 없음</span>
+                )}
               </div>
             </div>
           ))}

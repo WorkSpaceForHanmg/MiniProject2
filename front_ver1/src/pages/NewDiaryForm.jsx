@@ -13,6 +13,7 @@ const splitTags = (tagString) =>
 
 export default function NewDiaryForm({ onSave }) {
   const [form, setForm] = useState({
+    title: '',
     date: '',
     project: '',
     tags: '',
@@ -36,6 +37,7 @@ export default function NewDiaryForm({ onSave }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
 
     if (!form.date || !form.project) {
       setFeedbackMessage('날짜와 프로젝트명은 필수 입력 항목입니다.');
@@ -48,6 +50,7 @@ export default function NewDiaryForm({ onSave }) {
     try {
       const newDiary = {
         // id는 context에서 부여하므로 여기서 빼는 것이 안전함
+        title: form.title.trim() || '제목 없음',
         date: form.date,
         project: form.project,
         tags: splitTags(form.tags),
@@ -84,6 +87,7 @@ export default function NewDiaryForm({ onSave }) {
         <h2>새 일기 작성</h2>
       </header>
 
+
       <form className={styles.newDiaryForm} onSubmit={handleSubmit}>
         <label>
           날짜:
@@ -92,6 +96,18 @@ export default function NewDiaryForm({ onSave }) {
             name="date"
             value={form.date}
             onChange={handleChange}
+            required
+          />
+        </label>
+
+        <label>
+          제목:
+          <input
+            type="text"
+            name="title"
+            value={form.title}
+            onChange={handleChange}
+            placeholder="일기 제목을 입력하세요"
             required
           />
         </label>

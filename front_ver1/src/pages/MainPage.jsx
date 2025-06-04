@@ -59,8 +59,23 @@ export default function MainPage() {
         {filteredDiaries.length === 0 && <p>조건에 맞는 일기가 없습니다.</p>}
         {filteredDiaries.map((d) => (
           <div key={d.id} className={styles.diaryItem}>
-            <div><strong>{d.project}</strong> | 태그: {d.tags.join(', ')}</div>
-            <div>➝ {d.summary}</div>
+            <div className={styles.projectTitle}>
+              <strong>{d.project}</strong> <em>{d.title || '제목 없음'}</em>
+            </div>
+
+            <div className={styles.summary}>➝ {d.summary}</div>
+
+            <div className={styles.tags}>
+              {d.tags && d.tags.length > 0
+                ? d.tags.map((tag) => (
+                  <span key={tag} className={styles.tag}>
+                    {tag}
+                  </span>
+                ))
+                : <em className={styles.noTags}>태그 없음</em>
+              }
+            </div>
+
             <button
               className={styles.detailBtn}
               onClick={() => navigate(`/diary/${d.id}`)}
