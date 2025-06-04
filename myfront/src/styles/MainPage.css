@@ -1,0 +1,90 @@
+.page-container {
+  text-align: center;
+  padding: 40px;
+  font-family: 'Arial', sans-serif;
+}
+
+.title {
+  font-size: 2.5rem;
+  margin-bottom: 40px;
+}
+
+.diary-container {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+}
+
+.filter-calendar {
+  border: 1px dashed #aaa;
+  padding: 20px;
+  width: 350px;
+  box-sizing: border-box;
+}
+
+.filter-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.calendar-section input[type="date"] {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 10px;
+}
+
+.calendar-placeholder {
+  height: 200px;
+  border: 1px solid #ccc;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #777;
+}
+
+.diary-list {
+  width: 350px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.diary-card {
+  border: 1px solid #ddd;
+  padding: 15px;
+  text-align: left;
+  background-color: #fff;
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.tag {
+  background-color: #ddd;
+  padding: 2px 6px;
+  border-radius: 5px;
+  font-size: 0.8rem;
+}
+
+.view-button {
+  background-color: #005bac;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.new-entry-button {
+  margin-top: 20px;
+  background-color: #005bac;
+  color: white;
+  border: none;
+  padding: 10px;
+  cursor: pointer;
+}
