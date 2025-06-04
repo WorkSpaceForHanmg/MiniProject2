@@ -98,3 +98,13 @@
 .cancelBtn:hover {
   background-color: #aaa;
 }
+
+.feedback {
+  margin-top: 1rem;
+  color: #4caf50; /* 성공 메시지 */
+  font-weight: bold;
+}
+
+.feedback:has(> .error) {
+  color: #f44336; /* 에러 메시지 */
+}

@@ -1,23 +1,18 @@
-import React, { useState } from 'react';
+import React from 'react';
 import styles from '../styles/MainPage.module.css';
 import { useNavigate } from 'react-router-dom';
+import PropTypes from 'prop-types';
+import { useDiary } from '../context/DiaryContext';
+import useDiaryFilters from '../hooks/useDiaryFilters';
 
 const dummyProjects = ['개발 일기 웹앱', '프로젝트 A', '프로젝트 B'];
 const dummyTags = ['React', 'Spring', 'JavaScript'];
 
-export default function MainPage({ diaries }) {
-  const [selectedProject, setSelectedProject] = useState('');
-  const [selectedTag, setSelectedTag] = useState('');
-  const [selectedDate, setSelectedDate] = useState('');
+export default function MainPage() {
+  const { diaries } = useDiary();
   const navigate = useNavigate();
 
-  const filteredDiaries = diaries.filter((d) => {
-    return (
-      (selectedProject === '' || d.project === selectedProject) &&
-      (selectedTag === '' || d.tags.includes(selectedTag)) &&
-      (selectedDate === '' || d.date === selectedDate)
-    );
-  });
+  const { filters, handleFilterChange, filteredDiaries } = useDiaryFilters(diaries || []);
 
   return (
     <div className={styles.container}>
@@ -26,7 +21,10 @@ export default function MainPage({ diaries }) {
       <section className={styles.filtersRow}>
         <div className={styles.filterGroup}>
           <label>프로젝트</label>
-          <select value={selectedProject} onChange={(e) => setSelectedProject(e.target.value)}>
+          <select
+            value={filters.project}
+            onChange={(e) => handleFilterChange('project', e.target.value)}
+          >
             <option value="">전체</option>
             {dummyProjects.map((p) => (
               <option key={p} value={p}>{p}</option>
@@ -36,7 +34,10 @@ export default function MainPage({ diaries }) {
 
         <div className={styles.filterGroup}>
           <label>태그</label>
-          <select value={selectedTag} onChange={(e) => setSelectedTag(e.target.value)}>
+          <select
+            value={filters.tag}
+            onChange={(e) => handleFilterChange('tag', e.target.value)}
+          >
             <option value="">전체</option>
             {dummyTags.map((t) => (
               <option key={t} value={t}>{t}</option>
@@ -48,8 +49,8 @@ export default function MainPage({ diaries }) {
           <label>날짜</label>
           <input
             type="date"
-            value={selectedDate}
-            onChange={(e) => setSelectedDate(e.target.value)}
+            value={filters.date}
+            onChange={(e) => handleFilterChange('date', e.target.value)}
           />
         </div>
       </section>
@@ -78,10 +79,26 @@ export default function MainPage({ diaries }) {
       </button>
 
       <div className={styles.newDiaryWrapper}>
-        <button className={styles.newDiaryBtn} onClick={() => navigate('/new')}>
+        <button
+          className={styles.newDiaryBtn}
+          onClick={() => navigate('/new')}
+        >
           + 새 일기 작성
         </button>
       </div>
     </div>
   );
 }
+
+MainPage.propTypes = {
+  diaries: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.number.isRequired,
+      date: PropTypes.string.isRequired,
+      project: PropTypes.string.isRequired,
+      tags: PropTypes.arrayOf(PropTypes.string).isRequired,
+      summary: PropTypes.string,
+      content: PropTypes.string.isRequired,
+    })
+  ).isRequired,
+};

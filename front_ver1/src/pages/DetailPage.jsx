@@ -1,12 +1,13 @@
-// DetailPage.jsx
 import React, { useState, useMemo, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useDiary } from '../context/DiaryContext';  // 추가
 import styles from '../styles/DetailPage.module.css';
 
-export default function DetailPage({ diaries, onUpdateDiary, onDeleteDiary }) {
+export default function DetailPage() {
   const navigate = useNavigate();
   const { diaryId } = useParams();
-  const selectedDiaryId = Number(diaryId);
+
+  const { diaries, updateDiary, deleteDiary } = useDiary(); // context에서 데이터 및 함수 가져오기
 
   const [projectFilter, setProjectFilter] = useState('');
   const [tagFilter, setTagFilter] = useState('');
@@ -19,7 +20,12 @@ export default function DetailPage({ diaries, onUpdateDiary, onDeleteDiary }) {
     errors: '',
   });
 
-  // 프로젝트, 태그 필터링
+  // 선택된 일기 찾기 (타입 일치시켜서 비교)
+  const selectedDiary = useMemo(() => {
+    return diaries.find(d => String(d.id) === String(diaryId)) || null;
+  }, [diaries, diaryId]);
+
+  // 필터링
   const filteredDiaries = useMemo(() => {
     return diaries.filter(diary => {
       const matchesProject = projectFilter === '' || diary.project.includes(projectFilter);
@@ -28,32 +34,45 @@ export default function DetailPage({ diaries, onUpdateDiary, onDeleteDiary }) {
     });
   }, [diaries, projectFilter, tagFilter]);
 
-  // 날짜 내림차순 정렬
+  // 정렬
   const sortedDiaries = useMemo(() => {
     return [...filteredDiaries].sort((a, b) => (a.date < b.date ? 1 : -1));
   }, [filteredDiaries]);
 
-  // 선택된 일기 찾기
-  const selectedDiary = sortedDiaries.find(d => d.id === selectedDiaryId) || null;
-
-  // JSON content 파싱
+  // 내용 파싱
   const parsedContent = useMemo(() => {
-    if (!selectedDiary || !selectedDiary.content) return {};
+    if (!selectedDiary || !selectedDiary.content) {
+      return {
+        codeExplanation: '',
+        devReview: '',
+        challenges: '',
+        errorSummary: '',
+        errorTags: [],
+        errorSolution: ''
+      };
+    }
     try {
       return JSON.parse(selectedDiary.content);
     } catch {
-      return {};
+      return {
+        codeExplanation: '',
+        devReview: '',
+        challenges: '',
+        errorSummary: '',
+        errorTags: [],
+        errorSolution: ''
+      };
     }
   }, [selectedDiary]);
 
-  // diaryId가 없거나 유효하지 않으면 첫 번째 일기로 강제 이동
+  // 없는 diaryId 처리 → 첫 번째 일기로 이동
   useEffect(() => {
     if ((!diaryId || !selectedDiary) && sortedDiaries.length > 0) {
       navigate(`/diary/${sortedDiaries[0].id}`, { replace: true });
     }
   }, [diaryId, selectedDiary, sortedDiaries, navigate]);
 
-  // 선택된 일기 변경 시 에디트 폼 초기화
+  // 선택된 일기 바뀔 때 에디트 폼 초기화
   useEffect(() => {
     if (selectedDiary) {
       setEditForm({
@@ -84,13 +103,13 @@ export default function DetailPage({ diaries, onUpdateDiary, onDeleteDiary }) {
         errorSolution: parsedContent.errorSolution || '',
       }),
     };
-    onUpdateDiary(selectedDiary.id, updatedDiary);
+    updateDiary(selectedDiary.id, updatedDiary);
     setIsEditing(false);
   };
 
   const handleDelete = () => {
     if (window.confirm('정말 삭제하시겠습니까?')) {
-      onDeleteDiary(selectedDiary.id);
+      deleteDiary(selectedDiary.id);
       navigate('/', { replace: true });
     }
   };
@@ -130,7 +149,7 @@ export default function DetailPage({ diaries, onUpdateDiary, onDeleteDiary }) {
             {sortedDiaries.map(diary => (
               <li
                 key={diary.id}
-                className={diary.id === selectedDiaryId ? styles.selectedDiaryItem : ''}
+                className={String(diary.id) === diaryId ? styles.selectedDiaryItem : ''}
                 onClick={() => handleSelectDiary(diary.id)}
               >
                 {diary.date}
@@ -216,22 +235,22 @@ export default function DetailPage({ diaries, onUpdateDiary, onDeleteDiary }) {
 
                   <section>
                     <h4>코드 및 설명</h4>
-                    <pre>{editForm.code}</pre>
+                    <pre>{parsedContent.codeExplanation}</pre>
                   </section>
 
                   <section>
                     <h4>개발 소감</h4>
-                    <p>{editForm.devReview}</p>
+                    <p>{parsedContent.devReview}</p>
                   </section>
 
                   <section>
                     <h4>어려웠던 점</h4>
-                    <p>{editForm.challenges}</p>
+                    <p>{parsedContent.challenges}</p>
                   </section>
 
                   <section>
                     <h4>에러 및 해결</h4>
-                    <pre>{editForm.errors}</pre>
+                    <pre>{parsedContent.errorSummary}</pre>
                   </section>
                 </>
               )}
