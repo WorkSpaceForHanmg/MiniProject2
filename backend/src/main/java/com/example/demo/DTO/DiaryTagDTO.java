@@ -44,7 +44,7 @@ public class DiaryTagDTO {
                     .dtid(diaryTag.getDtid())
                     .diary(DiaryDTO.SimpleResponse.builder()
                             .did(diaryTag.getDiary().getDid())
-                            .date(diaryTag.getDiary().getDate())
+                            .date(diaryTag.getDiary().getDate().toString())
                             .title(diaryTag.getDiary().getDevfeel())
                             .build())
                     .tag(TagDTO.SimpleResponse.builder()

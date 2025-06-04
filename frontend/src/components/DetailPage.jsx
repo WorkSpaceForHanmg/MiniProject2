@@ -1,14 +1,13 @@
+// DetailPage.jsx
 import React, { useState, useMemo, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import styles from '../styles/DetailPage.module.css';
 
-export default function DetailPage({
-  diaries,
-  selectedDiaryId,
-  onBack,
-  onSelectDiary,
-  onUpdateDiary,
-  onDeleteDiary,
-}) {
+export default function DetailPage({ diaries, onUpdateDiary, onDeleteDiary }) {
+  const navigate = useNavigate();
+  const { diaryId } = useParams();
+  const selectedDiaryId = Number(diaryId);
+
   const [projectFilter, setProjectFilter] = useState('');
   const [tagFilter, setTagFilter] = useState('');
   const [isEditing, setIsEditing] = useState(false);
@@ -20,6 +19,7 @@ export default function DetailPage({
     errors: '',
   });
 
+  // 프로젝트, 태그 필터링
   const filteredDiaries = useMemo(() => {
     return diaries.filter(diary => {
       const matchesProject = projectFilter === '' || diary.project.includes(projectFilter);
@@ -28,12 +28,15 @@ export default function DetailPage({
     });
   }, [diaries, projectFilter, tagFilter]);
 
+  // 날짜 내림차순 정렬
   const sortedDiaries = useMemo(() => {
     return [...filteredDiaries].sort((a, b) => (a.date < b.date ? 1 : -1));
   }, [filteredDiaries]);
 
+  // 선택된 일기 찾기
   const selectedDiary = sortedDiaries.find(d => d.id === selectedDiaryId) || null;
 
+  // JSON content 파싱
   const parsedContent = useMemo(() => {
     if (!selectedDiary || !selectedDiary.content) return {};
     try {
@@ -43,21 +46,24 @@ export default function DetailPage({
     }
   }, [selectedDiary]);
 
+  // diaryId가 없거나 유효하지 않으면 첫 번째 일기로 강제 이동
   useEffect(() => {
-    if (sortedDiaries.length > 0 && !selectedDiaryId) {
-      onSelectDiary(sortedDiaries[0].id);
+    if ((!diaryId || !selectedDiary) && sortedDiaries.length > 0) {
+      navigate(`/diary/${sortedDiaries[0].id}`, { replace: true });
     }
-  }, [sortedDiaries, selectedDiaryId, onSelectDiary]);
+  }, [diaryId, selectedDiary, sortedDiaries, navigate]);
 
+  // 선택된 일기 변경 시 에디트 폼 초기화
   useEffect(() => {
     if (selectedDiary) {
       setEditForm({
         summary: selectedDiary.summary || '',
-        code: parsedContent.code || '',
+        code: parsedContent.codeExplanation || '',
         devReview: parsedContent.devReview || '',
         challenges: parsedContent.challenges || '',
-        errors: parsedContent.errors || '',
+        errors: parsedContent.errorSummary || '',
       });
+      setIsEditing(false);
     }
   }, [selectedDiary, parsedContent]);
 
@@ -70,10 +76,12 @@ export default function DetailPage({
     const updatedDiary = {
       summary: editForm.summary,
       content: JSON.stringify({
-        code: editForm.code,
+        codeExplanation: editForm.code,
         devReview: editForm.devReview,
         challenges: editForm.challenges,
-        errors: editForm.errors,
+        errorSummary: editForm.errors,
+        errorTags: parsedContent.errorTags || [],
+        errorSolution: parsedContent.errorSolution || '',
       }),
     };
     onUpdateDiary(selectedDiary.id, updatedDiary);
@@ -83,20 +91,25 @@ export default function DetailPage({
   const handleDelete = () => {
     if (window.confirm('정말 삭제하시겠습니까?')) {
       onDeleteDiary(selectedDiary.id);
+      navigate('/', { replace: true });
     }
+  };
+
+  const handleSelectDiary = (id) => {
+    setIsEditing(false);
+    navigate(`/diary/${id}`);
   };
 
   return (
     <div className={styles.detailContainer}>
       <header className={styles.detailHeader}>
-        <button className={styles.backBtn} onClick={onBack}>
+        <button className={styles.backBtn} onClick={() => navigate(-1)}>
           ← 뒤로가기
         </button>
         <h2>일기 상세 보기</h2>
       </header>
 
       <div className={styles.detailContent}>
-        {/* 왼쪽 */}
         <div className={styles.leftPanel}>
           <div className={styles.filters}>
             <input
@@ -118,10 +131,7 @@ export default function DetailPage({
               <li
                 key={diary.id}
                 className={diary.id === selectedDiaryId ? styles.selectedDiaryItem : ''}
-                onClick={() => {
-                  setIsEditing(false);
-                  onSelectDiary(diary.id);
-                }}
+                onClick={() => handleSelectDiary(diary.id)}
               >
                 {diary.date}
               </li>
@@ -129,7 +139,6 @@ export default function DetailPage({
           </ul>
         </div>
 
-        {/* 오른쪽 */}
         <div className={styles.rightPanel}>
           {selectedDiary ? (
             <>
@@ -157,7 +166,7 @@ export default function DetailPage({
                     className={styles.textarea}
                   />
 
-                  <label><strong>코드 설명</strong></label>
+                  <label><strong>코드 및 설명</strong></label>
                   <textarea
                     name="code"
                     value={editForm.code}
@@ -184,41 +193,51 @@ export default function DetailPage({
                     className={styles.textarea}
                   />
 
-                  <label><strong>에러 해결</strong></label>
+                  <label><strong>에러 및 해결</strong></label>
                   <textarea
                     name="errors"
                     value={editForm.errors}
                     onChange={handleChange}
-                    rows={4}
+                    rows={6}
                     className={styles.textarea}
                   />
 
-                  <div className={styles.buttons}>
-                    <button className={styles.saveBtn} onClick={handleSave}>저장</button>
-                    <button className={styles.cancelBtn} onClick={() => setIsEditing(false)}>취소</button>
+                  <div className={styles.editButtons}>
+                    <button onClick={handleSave}>저장</button>
+                    <button onClick={() => setIsEditing(false)}>취소</button>
                   </div>
                 </>
               ) : (
                 <>
-                  <h4>요약</h4>
-                  <p>{selectedDiary.summary}</p>
+                  <section>
+                    <h4>요약</h4>
+                    <p>{selectedDiary.summary}</p>
+                  </section>
 
-                  <h4>코드 설명</h4>
-                  <pre className={styles.contentBox}>{parsedContent.code || '-'}</pre>
+                  <section>
+                    <h4>코드 및 설명</h4>
+                    <pre>{editForm.code}</pre>
+                  </section>
 
-                  <h4>개발 소감</h4>
-                  <pre className={styles.contentBox}>{parsedContent.devReview || '-'}</pre>
+                  <section>
+                    <h4>개발 소감</h4>
+                    <p>{editForm.devReview}</p>
+                  </section>
 
-                  <h4>어려웠던 점</h4>
-                  <pre className={styles.contentBox}>{parsedContent.challenges || '-'}</pre>
+                  <section>
+                    <h4>어려웠던 점</h4>
+                    <p>{editForm.challenges}</p>
+                  </section>
 
-                  <h4>에러 해결</h4>
-                  <pre className={styles.contentBox}>{parsedContent.errors || '-'}</pre>
+                  <section>
+                    <h4>에러 및 해결</h4>
+                    <pre>{editForm.errors}</pre>
+                  </section>
                 </>
               )}
             </>
           ) : (
-            <p>일기를 선택해주세요.</p>
+            <p>선택된 일기가 없습니다.</p>
           )}
         </div>
       </div>

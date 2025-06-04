@@ -12,7 +12,6 @@ import java.util.List;
 @RequestMapping("/api/diaries")
 @RequiredArgsConstructor
 public class DiaryController {
-
     private final DiaryService diaryService;
 
     // 전체 조회
