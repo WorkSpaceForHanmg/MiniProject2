@@ -6,7 +6,7 @@ spring:
     active: prod
 
   datasource:
-    url: jdbc:mariadb://127.0.0.1:3306/boot_db
+    url: jdbc:mariadb://127.0.0.1:3306/devdiary
     username: root
     password: maria
 

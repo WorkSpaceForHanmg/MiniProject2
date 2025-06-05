@@ -5,6 +5,7 @@ import com.example.demo.entity.Diary;
 import com.example.demo.entity.Project;
 import com.example.demo.entity.Tag;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -18,6 +19,7 @@ public class DiaryMapper {
                 .error(dto.getError())
                 .explaination(dto.getContent())
                 .project(project)
+                .diaryTags(new ArrayList<>())
                 .build();
     }
 

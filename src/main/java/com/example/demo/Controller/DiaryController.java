@@ -14,7 +14,7 @@ import java.util.List;
 public class DiaryController {
 
     private final DiaryService diaryService;
-
+r
     // 전체 조회
     @GetMapping
     public ResponseEntity<List<DiaryDTO.Response>> getAllDiaries() {
