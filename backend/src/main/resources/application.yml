@@ -6,7 +6,7 @@ spring:
   boot:
     admin:
       client:
-        url: http://localhost:8090
+        url: http://localhost:8085
   sql:
     init:
       mode: always
