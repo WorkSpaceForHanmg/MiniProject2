@@ -43,15 +43,6 @@
 ### 2.2 Entity 상속 구조
 ```mermaid
 classDiagram
-    class BaseEntity {
-        <<abstract>>
-        +Long id
-        +LocalDateTime createdAt
-        +LocalDateTime updatedAt
-        +String createdBy
-        +String lastModifiedBy
-    }
-
     Diary --> Project : ManyToOne
     Diary --> DiaryTag : OneToMany
     DiaryTag --> Diary : ManyToOne
