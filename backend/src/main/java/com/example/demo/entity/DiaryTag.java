@@ -19,11 +19,8 @@ public class DiaryTag {
     // N:1 다이어리 연결
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "did", nullable = false)
-    private Diary diary;
-
-    // N:1 태그 연결
+    private Diary diary;    // N:1 태그 연결
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "tid", nullable = false)
     private Tag tag;
 }
-//a

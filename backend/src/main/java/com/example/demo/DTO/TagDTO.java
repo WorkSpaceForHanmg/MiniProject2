@@ -37,9 +37,7 @@ public class TagDTO {
                     .name(tag.getName())
                     .build();
         }
-    }
-
-    @Data
+    }    @Data
     @NoArgsConstructor
     @AllArgsConstructor
     @Builder
@@ -48,4 +46,3 @@ public class TagDTO {
         private String name;
     }
 }
-//a

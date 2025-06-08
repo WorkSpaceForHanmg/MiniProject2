@@ -8,6 +8,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -41,10 +42,17 @@ public class DiaryTagService {
     // DiaryTag 삭제
     public void deleteDiaryTag(Long dtid) {
         diaryTagRepository.deleteById(dtid);
-    }
-
-    // 다이어리에 태그 연결하는 핵심 메서드
+    }    // 다이어리에 태그 연결하는 핵심 메서드
     public void connectTagsToDiary(Diary diary, List<Tag> tags) {
+        if (diary == null || tags == null || tags.isEmpty()) {
+            return;
+        }
+        
+        // diaryTags 리스트가 null인 경우 초기화
+        if (diary.getDiaryTags() == null) {
+            diary.setDiaryTags(new ArrayList<>());
+        }
+        
         List<DiaryTag> diaryTags = tags.stream()
                 .map(tag -> DiaryTag.builder()
                         .diary(diary)

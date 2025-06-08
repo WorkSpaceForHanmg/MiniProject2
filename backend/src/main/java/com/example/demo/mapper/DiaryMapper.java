@@ -4,19 +4,19 @@ import com.example.demo.DTO.DiaryDTO;
 import com.example.demo.entity.Diary;
 import com.example.demo.entity.Project;
 import com.example.demo.entity.Tag;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class DiaryMapper {
-
-    public static Diary dtoToEntity(DiaryDTO.Request dto, Project project) {
+@Component
+public class DiaryMapper {    public static Diary dtoToEntity(DiaryDTO.Request dto, Project project) {
         return Diary.builder()
                 .date(dto.getDate())
-                .devfeel(dto.getTitle())
+                .devfeel(dto.getDevfeel())
                 .diff(dto.getDiff())
                 .error(dto.getError())
-                .explaination(dto.getContent())
+                .explaination(dto.getExplaination())
                 .project(project)
                 .build();
     }
@@ -26,11 +26,11 @@ public class DiaryMapper {
 
         return DiaryDTO.Response.builder()
                 .did(diary.getDid())
-                .date(diary.getDate().toString())
-                .title(diary.getDevfeel())
+                .date(diary.getDate())
+                .devfeel(diary.getDevfeel())
                 .diff(diary.getDiff())
                 .error(diary.getError())
-                .content(diary.getExplaination())
+                .explaination(diary.getExplaination())
                 .projectId(project != null ? project.getPid() : null)
                 .projectName(project != null ? project.getName() : null)
                 .tags(diary.getTags() != null

@@ -36,16 +36,16 @@ public class DiaryTagDTO {
     public static class Response {
         private Long dtid;
         private DiaryDTO.SimpleResponse diary;
-        private TagDTO.SimpleResponse tag;
-
-        //Entity → DTO
+        private TagDTO.SimpleResponse tag;        //Entity → DTO
         public static Response fromEntity(DiaryTag diaryTag) {
             return Response.builder()
                     .dtid(diaryTag.getDtid())
                     .diary(DiaryDTO.SimpleResponse.builder()
                             .did(diaryTag.getDiary().getDid())
-                            .date(diaryTag.getDiary().getDate().toString())
-                            .title(diaryTag.getDiary().getDevfeel())
+                            .date(diaryTag.getDiary().getDate())
+                            .devfeel(diaryTag.getDiary().getDevfeel())
+                            .projectName(diaryTag.getDiary().getProject() != null ? 
+                                    diaryTag.getDiary().getProject().getName() : null)
                             .build())
                     .tag(TagDTO.SimpleResponse.builder()
                             .tid(diaryTag.getTag().getTid())
