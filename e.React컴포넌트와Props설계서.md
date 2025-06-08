@@ -201,7 +201,6 @@ src/
 
 ## API 연동
 
-### 주요 API 엔드포인트
 | API 엔드포인트 | 메서드 | 용도 | 호출 시점 |
 |----------------|--------|------|-----------|
 | /api/diaries | GET | 일기 목록 조회 | 페이지 로드 |
@@ -211,43 +210,11 @@ src/
 | /api/projects | GET | 프로젝트 목록 | 폼 로드 |
 | /api/tags | GET | 태그 목록 | 폼 로드 |
 
-## 데이터 구조
-
-### Diary 객체 구조
-```javascript
-{
-  id: number,
-  date: string,
-  project: string,
-  tags: string[],
-  summary: string,
-  content: string // JSON 문자열
-}
-```
-
-### Content JSON 구조
-```javascript
-{
-  codeExplanation: string,
-  devReview: string,
-  challenges: string,
-  errorSummary: string,
-  errorTags: string[],
-  errorSolution: string
-}
-```
-
 ## 성능 최적화
-
-### 적용된 최적화
 - [x] useMemo를 통한 필터링 결과 캐싱
 - [x] useEffect를 통한 사이드 이펙트 관리
 - [x] JSON 파싱 결과 메모이제이션
 
-### 권장 추가 최적화
-- [ ] React.memo로 컴포넌트 메모이제이션
-- [ ] useCallback으로 함수 메모이제이션
-- [ ] 가상화를 통한 긴 목록 최적화
 
 ## 외부 의존성
 
@@ -262,25 +229,3 @@ src/
 - **JSON.parse/stringify**: 컨텐츠 데이터 처리
 - **Array.filter/map**: 데이터 조작
 
-## 컴포넌트 간 관계도
-
-```
-App
-├── MainPage
-│   └── props: { diaries }
-├── DetailPage
-│   └── props: { diaries, onUpdateDiary, onDeleteDiary }
-├── NewDiaryForm
-│   └── props: { onSave, loading }
-├── ErrorNote
-│   └── props: { diaries }
-└── ProjectForm (레거시)
-```
-
-## 주요 기술적 특징
-
-1. **모듈화된 CSS**: CSS Modules 사용으로 스타일 충돌 방지
-2. **JSON 기반 컨텐츠**: 구조화된 일기 내용을 JSON으로 저장
-3. **실시간 필터링**: useMemo를 활용한 효율적인 필터링
-4. **라우터 연동**: React Router를 통한 SPA 네비게이션
-5. **에러 처리**: try-catch를 통한 안전한 JSON 파싱
