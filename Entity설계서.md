@@ -66,19 +66,6 @@ classDiagram
 | boolean 필드  | is + 형용사    | `isActive`             | 의미 명확히      |
 
 
-### 3.2 공통 어노테이션 규칙
-```java
-// 기본 Entity 구조
-@Entity
-@Table(name = "테이블명")
-@EntityListeners(AuditingEntityListener.class)
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Getter
-public class EntityName extends BaseEntity {
-    // 필드 정의
-}
-```
-
 ### 3.3 ID 생성 전략
 | Entity | 전략 | 이유 | 예시 |
 |--------|------|------|------|
@@ -91,882 +78,554 @@ public class EntityName extends BaseEntity {
 
 ## 4. 상세 Entity 설계
 
-### 4.1 Member Entity
+### 4.1 Diary Entity
 
 #### 4.1.1 기본 정보
 ```java
 @Entity
-@Table(name = "members", indexes = {
-    @Index(name = "idx_member_number", columnList = "member_number"),
-    @Index(name = "idx_email", columnList = "email"),
-    @Index(name = "idx_status", columnList = "status")
-})
-@EntityListeners(AuditingEntityListener.class)
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(name = "diary")
+@NoArgsConstructor
+@AllArgsConstructor
 @Getter
-public class Member extends BaseEntity {
+@Setter
+@Builder
+public class Diary {
     // 필드 정의 (아래 상세 명세 참조)
 }
+
 ```
 
 #### 4.1.2 필드 상세 명세
-| 필드명 | 데이터 타입 | 컬럼명 | 제약조건 | 설명 | 비즈니스 규칙 |
-|--------|-------------|--------|----------|------|---------------|
-| **id** | `Long` | `member_id` | PK, NOT NULL, AUTO_INCREMENT | 회원 고유 식별자 | 시스템 자동 생성 |
-| **memberNumber** | `String` | `member_number` | UNIQUE, NOT NULL, LENGTH(10) | 회원번호 | M + 9자리 숫자 |
-| **name** | `String` | `name` | NOT NULL, LENGTH(50) | 회원명 | 2-50자 한글/영문 |
-| **email** | `String` | `email` | UNIQUE, NOT NULL, LENGTH(100) | 이메일 | 로그인 ID 겸용 |
-| **password** | `String` | `password` | NOT NULL, LENGTH(255) | 암호화된 비밀번호 | BCrypt 암호화 |
-| **phoneNumber** | `String` | `phone_number` | LENGTH(15) | 전화번호 | 010-1234-5678 형식 |
-| **birthDate** | `LocalDate` | `birth_date` | NULL 허용 | 생년월일 | 통계 목적 |
-| **address** | `String` | `address` | LENGTH(200) | 주소 | 선택 항목 |
-| **status** | `MemberStatus` | `status` | NOT NULL, ENUM | 회원 상태 | ACTIVE, SUSPENDED, WITHDRAWN |
-| **maxLoanCount** | `Integer` | `max_loan_count` | NOT NULL, DEFAULT(5) | 최대 대출 권수 | 1-10 범위 |
+| 필드명              | 데이터 타입      | 컬럼명            | 제약조건                          | 설명         | 비즈니스 규칙                |
+| ---------------- | ----------- | -------------- | ----------------------------- | ---------- | ---------------------- |
+| **did**          | `Long`      | `did`          | PK, NOT NULL, AUTO\_INCREMENT | 다이어리 고유 ID | 시스템 자동 생성              |
+| **date**         | `LocalDate` | `date`         | NOT NULL                      | 작성 일자      | 하루에 하나만 허용 (로직상 검증 필요) |
+| **devfeel**      | `String`    | `devfeel`      | LENGTH(500)                   | 개발하면서 느낀 점 | 선택 항목                  |
+| **diff**         | `String`    | `diff`         | LENGTH(500)                   | 어려웠던 점     | 선택 항목                  |
+| **error**        | `String`    | `error`        | LENGTH(500)                   | 발생한 에러     | 선택 항목                  |
+| **explaination** | `String`    | `explaination` | TEXT                          | 문제 해결 설명   | 선택 항목                  |
+
 
 #### 4.1.3 연관관계 매핑
 ```java
-// 1:N - 회원의 대출 목록
-@OneToMany(mappedBy = "member", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-@OrderBy("createdAt DESC")
-private List<Loan> loans = new ArrayList<>();
+// 다이어리 ↔ 프로젝트 (N:1)
+@ManyToOne(fetch = FetchType.LAZY)
+@JoinColumn(name = "pid", nullable = true)
+private Project project;
 
-// 1:N - 회원의 예약 목록
-@OneToMany(mappedBy = "member", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-@OrderBy("createdAt DESC")
-private List<Reservation> reservations = new ArrayList<>();
+// 다이어리 ↔ 다이어리태그 (1:N)
+@OneToMany(mappedBy = "diary", cascade = CascadeType.ALL, orphanRemoval = true)
+private List<DiaryTag> diaryTags = new ArrayList<>();
+
 ```
 
-### 4.2 Book Entity
+### 4.2 Project Entity
 
 #### 4.2.1 필드 상세 명세
-| 필드명 | 데이터 타입 | 컬럼명 | 제약조건 | 설명 | 비즈니스 규칙 |
-|--------|-------------|--------|----------|------|---------------|
-| **id** | `Long` | `book_id` | PK, NOT NULL, AUTO_INCREMENT | 도서 고유 식별자 | 시스템 자동 생성 |
-| **isbn** | `String` | `isbn` | UNIQUE, NOT NULL, LENGTH(13) | ISBN | 13자리 숫자만 |
-| **title** | `String` | `title` | NOT NULL, LENGTH(200) | 도서명 | 필수 입력 |
-| **author** | `String` | `author` | NOT NULL, LENGTH(100) | 저자 | 필수 입력 |
-| **publisher** | `String` | `publisher` | LENGTH(100) | 출판사 | 선택 입력 |
-| **publicationDate** | `LocalDate` | `publication_date` | NULL 허용 | 출간일 | 선택 입력 |
-| **totalCopies** | `Integer` | `total_copies` | NOT NULL, MIN(1) | 총 보유 권수 | 1 이상 |
-| **availableCopies** | `Integer` | `available_copies` | NOT NULL, MIN(0) | 대출 가능 권수 | 0 이상 |
-| **price** | `BigDecimal` | `price` | PRECISION(10,2) | 도서 가격 | 선택 입력 |
-| **description** | `String` | `description` | TEXT | 도서 설명 | 선택 입력 |
-| **imageUrl** | `String` | `image_url` | LENGTH(500) | 표지 이미지 URL | 선택 입력 |
-| **pageCount** | `Integer` | `page_count` | MIN(1) | 페이지 수 | 선택 입력 |
-| **language** | `String` | `language` | LENGTH(10), DEFAULT('KO') | 언어 코드 | KO, EN, JP 등 |
-| **isActive** | `Boolean` | `is_active` | NOT NULL, DEFAULT(true) | 활성 여부 | 소프트 삭제용 |
+| 필드명      | 데이터 타입   | 컬럼명    | 제약조건                          | 설명         | 비즈니스 규칙   |
+| -------- | -------- | ------ | ----------------------------- | ---------- | --------- |
+| **pid**  | `Long`   | `pid`  | PK, NOT NULL, AUTO\_INCREMENT | 프로젝트 고유 ID | 시스템 자동 생성 |
+| **name** | `String` | `name` | NOT NULL, UNIQUE              | 프로젝트명      | 중복 불가, 필수 |
 
-#### 4.2.2 구현 코드 예시
+
+#### 4.2.3 연관관계 매핑
 ```java
-@Entity
-@Table(name = "books", indexes = {
-    @Index(name = "idx_isbn", columnList = "isbn"),
-    @Index(name = "idx_title", columnList = "title"),
-    @Index(name = "idx_author", columnList = "author"),
-    @Index(name = "idx_category", columnList = "category_id"),
-    @Index(name = "idx_available", columnList = "available_copies")
-})
-@EntityListeners(AuditingEntityListener.class)
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Getter
-public class Book extends BaseEntity {
+// 프로젝트 ↔ 다이어리 (1:N)
+@OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
+private List<Diary> diaries = new ArrayList<>();
 
-    @Column(nullable = false, unique = true, length = 13)
-    @Pattern(regexp = "^\\d{13}$", message = "ISBN은 13자리 숫자여야 합니다")
-    private String isbn;
-
-    @Column(nullable = false, length = 200)
-    @NotBlank(message = "제목은 필수입니다")
-    @Size(max = 200, message = "제목은 200자를 초과할 수 없습니다")
-    private String title;
-
-    @Column(nullable = false, length = 100)
-    @NotBlank(message = "저자는 필수입니다")
-    private String author;
-
-    @Column(name = "total_copies", nullable = false)
-    @Min(value = 1, message = "총 권수는 1 이상이어야 합니다")
-    private Integer totalCopies;
-
-    @Column(name = "available_copies", nullable = false)
-    @Min(value = 0, message = "대출가능 권수는 0 이상이어야 합니다")
-    private Integer availableCopies;
-
-    // ManyToOne - 카테고리
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id", nullable = false)
-    private Category category;
-
-    // OneToMany - 대출 이력
-    @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Loan> loans = new ArrayList<>();
-
-    // 비즈니스 메서드
-    public boolean isAvailable() {
-        return availableCopies > 0 && isActive;
-    }
-
-    public void decreaseAvailableCopies() {
-        if (availableCopies <= 0) {
-            throw new IllegalStateException("대출 가능한 책이 없습니다");
-        }
-        this.availableCopies--;
-    }
-
-    public void increaseAvailableCopies() {
-        if (availableCopies >= totalCopies) {
-            throw new IllegalStateException("반납할 수 있는 책이 없습니다");
-        }
-        this.availableCopies++;
-    }
-}
 ```
 
-### 4.3 Loan Entity
+### 4.3 Tag Entity
 
 #### 4.3.1 필드 상세 명세
-| 필드명 | 데이터 타입 | 컬럼명 | 제약조건 | 설명 | 비즈니스 규칙 |
-|--------|-------------|--------|----------|------|---------------|
-| **id** | `Long` | `loan_id` | PK, NOT NULL, AUTO_INCREMENT | 대출 고유 식별자 | 시스템 자동 생성 |
-| **loanNumber** | `String` | `loan_number` | UNIQUE, NOT NULL, LENGTH(12) | 대출번호 | L + YYYYMMDD + 4자리 |
-| **loanDate** | `LocalDate` | `loan_date` | NOT NULL | 대출일 | 승인일 기준 |
-| **dueDate** | `LocalDate` | `due_date` | NOT NULL | 반납예정일 | 대출일 + 14일 |
-| **returnDate** | `LocalDate` | `return_date` | NULL 허용 | 실제반납일 | 반납 시 입력 |
-| **status** | `LoanStatus` | `status` | NOT NULL, ENUM | 대출상태 | REQUESTED, APPROVED, BORROWED, RETURNED, OVERDUE, CANCELLED |
-| **overdueFee** | `BigDecimal` | `overdue_fee` | PRECISION(10,2), DEFAULT(0) | 연체료 | 1일당 100원 |
-| **notes** | `String` | `notes` | TEXT | 비고 | 선택 입력 |
+| 필드명      | 데이터 타입   | 컬럼명    | 제약조건                          | 설명       | 비즈니스 규칙   |
+| -------- | -------- | ------ | ----------------------------- | -------- | --------- |
+| **tid**  | `Long`   | `tid`  | PK, NOT NULL, AUTO\_INCREMENT | 태그 고유 ID | 시스템 자동 생성 |
+| **name** | `String` | `name` | NOT NULL, UNIQUE              | 태그 이름    | 중복 불가, 필수 |
 
-#### 4.3.2 구현 코드 예시
+
+#### 4.3.2 연관관계 매핑
 ```java
-@Entity
-@Table(name = "loans", indexes = {
-    @Index(name = "idx_loan_number", columnList = "loan_number"),
-    @Index(name = "idx_member_status", columnList = "member_id, status"),
-    @Index(name = "idx_book_status", columnList = "book_id, status"),
-    @Index(name = "idx_due_date", columnList = "due_date"),
-    @Index(name = "idx_status", columnList = "status")
-})
-@EntityListeners(AuditingEntityListener.class)
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Getter
-public class Loan extends BaseEntity {
+// 태그 ↔ 다이어리태그 (1:N)
+@OneToMany(mappedBy = "tag", cascade = CascadeType.ALL, orphanRemoval = true)
+private List<DiaryTag> diaryTags = new ArrayList<>();
 
-    @Column(name = "loan_number", unique = true, nullable = false, length = 12)
-    private String loanNumber;
-
-    @Column(name = "loan_date", nullable = false)
-    private LocalDate loanDate;
-
-    @Column(name = "due_date", nullable = false)
-    private LocalDate dueDate;
-
-    @Column(name = "return_date")
-    private LocalDate returnDate;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private LoanStatus status = LoanStatus.REQUESTED;
-
-    @Column(name = "overdue_fee", precision = 10, scale = 2)
-    private BigDecimal overdueFee = BigDecimal.ZERO;
-
-    // ManyToOne 관계
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id", nullable = false)
-    private Member member;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "book_id", nullable = false)
-    private Book book;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "approved_by")
-    private Admin approvedBy;
-
-    // 비즈니스 메서드
-    public boolean isOverdue() {
-        return status == LoanStatus.BORROWED && 
-               LocalDate.now().isAfter(dueDate);
-    }
-
-    public long getOverdueDays() {
-        if (!isOverdue()) {
-            return 0;
-        }
-        return ChronoUnit.DAYS.between(dueDate, LocalDate.now());
-    }
-
-    public BigDecimal calculateOverdueFee() {
-        if (!isOverdue()) {
-            return BigDecimal.ZERO;
-        }
-        return BigDecimal.valueOf(getOverdueDays())
-                .multiply(new BigDecimal("100")); // 1일당 100원
-    }
-
-    public void approve(Admin admin) {
-        if (this.status != LoanStatus.REQUESTED) {
-            throw new IllegalStateException("승인 가능한 상태가 아닙니다");
-        }
-        if (!book.isAvailable()) {
-            throw new IllegalStateException("대출 가능한 도서가 아닙니다");
-        }
-        
-        this.status = LoanStatus.APPROVED;
-        this.approvedBy = admin;
-        this.loanDate = LocalDate.now();
-        this.dueDate = this.loanDate.plusDays(14);
-        
-        // 도서 재고 감소
-        book.decreaseAvailableCopies();
-    }
-
-    public void returnBook() {
-        if (status != LoanStatus.BORROWED && status != LoanStatus.OVERDUE) {
-            throw new IllegalStateException("반납할 수 있는 상태가 아닙니다");
-        }
-        
-        this.returnDate = LocalDate.now();
-        this.status = LoanStatus.RETURNED;
-        this.overdueFee = calculateOverdueFee();
-        
-        // 도서 재고 증가
-        book.increaseAvailableCopies();
-    }
-}
 ```
+### 4.4 DiaryTag Entity
 
----
+#### 4.4.1 필드 상세 명세
+| 필드명      | 데이터 타입 | 컬럼명    | 제약조건                          | 설명    | 비즈니스 규칙   |
+| -------- | ------ | ------ | ----------------------------- | ----- | --------- |
+| **dtid** | `Long` | `dtid` | PK, NOT NULL, AUTO\_INCREMENT | 조인 ID | 시스템 자동 생성 |
 
-## 5. Enum 타입 정의
-
-### 5.1 MemberStatus
+#### 4.3.2 연관관계 매핑
 ```java
-public enum MemberStatus {
-    ACTIVE("활성", "정상적으로 서비스 이용 가능"),
-    SUSPENDED("정지", "일시적으로 서비스 이용 정지"),
-    WITHDRAWN("탈퇴", "서비스 탈퇴 완료");
-
-    private final String displayName;
-    private final String description;
-
-    MemberStatus(String displayName, String description) {
-        this.displayName = displayName;
-        this.description = description;
-    }
-
-    public String getDisplayName() {
-        return displayName;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public boolean isActive() {
-        return this == ACTIVE;
-    }
-}
-```
-
-### 5.2 LoanStatus
-```java
-public enum LoanStatus {
-    REQUESTED("신청", "대출 신청 상태"),
-    APPROVED("승인", "관리자가 승인한 상태"),
-    BORROWED("대출중", "실제 대출이 진행 중인 상태"),
-    RETURNED("반납완료", "정상 반납 완료"),
-    OVERDUE("연체", "반납일을 초과한 상태"),
-    CANCELLED("취소", "대출 신청이 취소된 상태");
-
-    private final String displayName;
-    private final String description;
-
-    LoanStatus(String displayName, String description) {
-        this.displayName = displayName;
-        this.description = description;
-    }
-
-    public boolean isActiveStatus() {
-        return this == BORROWED || this == OVERDUE;
-    }
-
-    public boolean isCompletedStatus() {
-        return this == RETURNED || this == CANCELLED;
-    }
-}
-```
-
----
-
-## 6. 연관관계 매핑 전략
-
-### 6.1 연관관계 매핑 규칙
-| 관계 유형 | 기본 전략 | 이유 | 예외 상황 |
-|----------|-----------|------|-----------|
-| **@ManyToOne** | LAZY | 성능 최적화 | 필수 조회 데이터는 EAGER |
-| **@OneToMany** | LAZY | N+1 문제 방지 | 소량 데이터는 EAGER |
-| **@OneToOne** | LAZY | 일관성 유지 | 항상 함께 조회하는 경우 EAGER |
-| **@ManyToMany** | 사용 금지 | 복잡성 증가 | 중간 테이블로 대체 |
-
-### 6.2 Cascade 옵션 가이드
-```java
-// 부모-자식 관계 (강한 연결)
-@OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-private List<Loan> loans = new ArrayList<>();
-
-// 참조 관계 (약한 연결)
+// 다이어리태그 ↔ 다이어리 (N:1)
 @ManyToOne(fetch = FetchType.LAZY)
-@JoinColumn(name = "category_id")
-private Category category; // cascade 없음
+@JoinColumn(name = "did", nullable = false)
+private Diary diary;
 
-// 선택적 관계
-@OneToMany(mappedBy = "book", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-private List<Reservation> reservations = new ArrayList<>();
+// 다이어리태그 ↔ 태그 (N:1)
+@ManyToOne(fetch = FetchType.LAZY)
+@JoinColumn(name = "tid", nullable = false)
+private Tag tag;
 ```
-
-### 6.3 양방향 연관관계 관리
-```java
-// Member Entity에서
-public void addLoan(Loan loan) {
-    loans.add(loan);
-    loan.setMember(this); // 양방향 연관관계 동기화
-}
-
-public void removeLoan(Loan loan) {
-    loans.remove(loan);
-    loan.setMember(null);
-}
-
-// Loan Entity에서
-public void setMember(Member member) {
-    // 기존 관계 제거
-    if (this.member != null) {
-        this.member.getLoans().remove(this);
-    }
-    
-    this.member = member;
-    
-    // 새로운 관계 설정
-    if (member != null && !member.getLoans().contains(this)) {
-        member.getLoans().add(this);
-    }
-}
-```
-
 ---
 
-## 7. 감사(Auditing) 설정
+## 5. 연관관계 매핑 전략
 
-### 7.1 BaseEntity 구현
+### 5.1 연관관계 매핑 규칙
+| 관계 유형        | Entity               | 필드명         | 기본 전략 | 이유                         | 예외 상황                   |
+| ------------ | -------------------- | ----------- | ----- | -------------------------- | ----------------------- |
+| `@ManyToOne` | `Diary` → `Project`  | `project`   | LAZY  | 프로젝트는 선택적 관계이며 자주 조회되지 않음  | -                       |
+| `@ManyToOne` | `DiaryTag` → `Diary` | `diary`     | LAZY  | 다이어리가 항상 필요한 경우는 아님        | -                       |
+| `@ManyToOne` | `DiaryTag` → `Tag`   | `tag`       | LAZY  | 태그는 사전 정의되며 캐시 또는 지연 로딩 가능 | -                       |
+| `@OneToMany` | `Project` → `Diary`  | `diaries`   | LAZY  | 프로젝트별 일기 목록은 일반적으로 조회되지 않음 | 관리용 페이지 등에서 EAGER 고려 가능 |
+| `@OneToMany` | `Diary` → `DiaryTag` | `diaryTags` | LAZY  | 태그는 일기와 함께 쓰이긴 하나 필수 아님    | 필요 시 DTO로 fetch         |
+| `@OneToMany` | `Tag` → `DiaryTag`   | `diaryTags` | LAZY  | 태그에 연결된 일기 목록은 주로 분석/검색용   | -                       |
+
+
+### 5.2 Cascade 옵션 가이드
 ```java
-@MappedSuperclass
-@EntityListeners(AuditingEntityListener.class)
-@Getter
-public abstract class BaseEntity {
+// Diary → DiaryTag (강한 부모-자식 관계)
+@OneToMany(mappedBy = "diary", cascade = CascadeType.ALL, orphanRemoval = true)
+private List<DiaryTag> diaryTags = new ArrayList<>();
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    private Long id;
+// Tag → DiaryTag (강한 부모-자식 관계)
+@OneToMany(mappedBy = "tag", cascade = CascadeType.ALL, orphanRemoval = true)
+private List<DiaryTag> diaryTags = new ArrayList<>();
 
-    @CreatedDate
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
+// Project → Diary (강한 부모-자식 관계)
+@OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
+private List<Diary> diaries = new ArrayList<>();
 
-    @LastModifiedDate
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
-
-    @CreatedBy
-    @Column(name = "created_by", updatable = false)
-    private String createdBy;
-
-    @LastModifiedBy
-    @Column(name = "last_modified_by")
-    private String lastModifiedBy;
-
-    @Version
-    @Column(name = "version")
-    private Long version;
-
-    // equals, hashCode는 id 기반으로 구현
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        BaseEntity that = (BaseEntity) o;
-        return Objects.equals(id, that.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
-    }
-}
+// Diary → Project (약한 참조 관계)
+@ManyToOne(fetch = FetchType.LAZY)
+@JoinColumn(name = "pid", nullable = true)
+private Project project; // cascade 없음
 ```
 
-### 7.2 Auditing 설정
+### 5.3 양방향 연관관계 관리
 ```java
-@Configuration
-@EnableJpaAuditing
-public class JpaAuditingConfig {
+// Diary Entity
+public void addTag(Tag tag) {
+    DiaryTag diaryTag = new DiaryTag(this, tag);
+    diaryTags.add(diaryTag);
+    tag.getDiaryTags().add(diaryTag);
+}
 
-    @Bean
-    public AuditorAware<String> auditorProvider() {
-        return () -> {
-            // Spring Security에서 현재 사용자 정보 조회
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            
-            if (authentication == null || !authentication.isAuthenticated()) {
-                return Optional.of("SYSTEM");
-            }
-            
-            return Optional.of(authentication.getName());
-        };
-    }
+public void removeTag(Tag tag) {
+    diaryTags.removeIf(dt -> {
+        boolean match = dt.getTag().equals(tag);
+        if (match) tag.getDiaryTags().remove(dt);
+        return match;
+    });
+}
+
+// Project Entity
+public void addDiary(Diary diary) {
+    diaries.add(diary);
+    diary.setProject(this);
+}
+
+public void removeDiary(Diary diary) {
+    diaries.remove(diary);
+    diary.setProject(null);
+}
+
+// Tag Entity
+public void addDiaryTag(Diary diary) {
+    DiaryTag diaryTag = new DiaryTag(diary, this);
+    diaryTags.add(diaryTag);
+    diary.getDiaryTags().add(diaryTag);
 }
 ```
-
 ---
 
-## 8. 성능 최적화 전략
-
-### 8.1 인덱스 설계 전략
+## 6. 테스트 전략
+### 6.1 EntityIntegrity 테스트
 ```java
-// 복합 인덱스 - 자주 함께 조회되는 컬럼
-@Table(name = "loans", indexes = {
-    @Index(name = "idx_member_status", columnList = "member_id, status"),
-    @Index(name = "idx_book_status_date", columnList = "book_id, status, loan_date"),
-    @Index(name = "idx_due_date_status", columnList = "due_date, status")
-})
-
-// 단일 인덱스 - 검색 조건으로 자주 사용
-@Index(name = "idx_loan_number", columnList = "loan_number", unique = true)
-@Index(name = "idx_created_at", columnList = "created_at")
-```
-
-### 8.2 N+1 문제 해결
-```java
-// Repository에서 fetch join 사용
-public interface LoanRepository extends JpaRepository<Loan, Long> {
-    
-    @Query("SELECT l FROM Loan l " +
-           "JOIN FETCH l.member m " +
-           "JOIN FETCH l.book b " +
-           "JOIN FETCH b.category " +
-           "WHERE l.status = :status")
-    List<Loan> findByStatusWithDetails(@Param("status") LoanStatus status);
-    
-    // @EntityGraph 사용
-    @EntityGraph(attributePaths = {"member", "book", "book.category"})
-    List<Loan> findByMemberIdAndStatus(Long memberId, LoanStatus status);
-}
-```
-
-### 8.3 쿼리 최적화
-```java
-// 페이징과 정렬
-@Query("SELECT l FROM Loan l " +
-       "WHERE l.member.id = :memberId " +
-       "ORDER BY l.createdAt DESC")
-Page<Loan> findByMemberIdOrderByCreatedAtDesc(
-    @Param("memberId") Long memberId, 
-    Pageable pageable);
-
-// 집계 쿼리
-@Query("SELECT COUNT(l) FROM Loan l " +
-       "WHERE l.member.id = :memberId " +
-       "AND l.status = :status")
-long countByMemberIdAndStatus(
-    @Param("memberId") Long memberId, 
-    @Param("status") LoanStatus status);
-
-// 조건부 쿼리 (Specifications 활용)
-public class LoanSpecifications {
-    public static Specification<Loan> hasStatus(LoanStatus status) {
-        return (root, query, criteriaBuilder) ->
-            status == null ? null : criteriaBuilder.equal(root.get("status"), status);
-    }
-    
-    public static Specification<Loan> isOverdue() {
-        return (root, query, criteriaBuilder) ->
-            criteriaBuilder.and(
-                criteriaBuilder.equal(root.get("status"), LoanStatus.BORROWED),
-                criteriaBuilder.lessThan(root.get("dueDate"), LocalDate.now())
-            );
-    }
-}
-```
-
----
-
-## 9. 검증 및 제약조건
-
-### 9.1 Bean Validation 어노테이션
-```java
-// 커스텀 검증 어노테이션
-@Target({ElementType.FIELD})
-@Retention(RetentionPolicy.RUNTIME)
-@Constraint(validatedBy = ISBNValidator.class)
-public @interface ValidISBN {
-    String message() default "유효하지 않은 ISBN입니다";
-    Class<?>[] groups() default {};
-    Class<? extends Payload>[] payload() default {};
-}
-
-// 검증 구현 클래스
-public class ISBNValidator implements ConstraintValidator<ValidISBN, String> {
-    
-    @Override
-    public boolean isValid(String isbn, ConstraintValidatorContext context) {
-        if (isbn == null || isbn.length() != 13) {
-            return false;
-        }
-        
-        // ISBN-13 체크섬 검증 로직
-        try {
-            int sum = 0;
-            for (int i = 0; i < 12; i++) {
-                int digit = Character.getNumericValue(isbn.charAt(i));
-                sum += (i % 2 == 0) ? digit : digit * 3;
-            }
-            int checkDigit = 10 - (sum % 10);
-            if (checkDigit == 10) checkDigit = 0;
-            
-            return checkDigit == Character.getNumericValue(isbn.charAt(12));
-        } catch (NumberFormatException e) {
-            return false;
-        }
-    }
-}
-
-// Entity에서 사용
-@ValidISBN
-@Column(nullable = false, unique = true, length = 13)
-private String isbn;
-```
-
-### 9.2 데이터베이스 제약조건
-```java
-// 체크 제약조건
-@Entity
-@Table(name = "books", 
-    uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"isbn"}),
-        @UniqueConstraint(columnNames = {"title", "author", "publisher"})
-    },
-    // MySQL에서는 체크 제약조건 대신 트리거 사용
-    indexes = {
-        @Index(name = "idx_isbn", columnList = "isbn"),
-        @Index(name = "idx_title_author", columnList = "title, author")
-    }
-)
-public class Book extends BaseEntity {
-    
-    // JPA 수준에서 검증
-    @PrePersist
-    @PreUpdate
-    private void validateConstraints() {
-        if (availableCopies > totalCopies) {
-            throw new IllegalArgumentException(
-                "대출가능 권수는 총 권수를 초과할 수 없습니다");
-        }
-        if (totalCopies < 1) {
-            throw new IllegalArgumentException(
-                "총 권수는 1 이상이어야 합니다");
-        }
-    }
-}
-```
-
----
-
-## 10. 테스트 전략
-
-### 10.1 Entity 단위 테스트
-```java
-@DisplayName("Member Entity 테스트")
-class MemberTest {
-
-    @Test
-    @DisplayName("회원 생성 시 기본값이 올바르게 설정되어야 한다")
-    void createMember_ShouldSetDefaultValues() {
-        // given
-        String name = "김철수";
-        String email = "kim@test.com";
-        String password = "password123";
-        
-        // when
-        Member member = Member.createMember(name, email, password, null, null, null);
-        
-        // then
-        assertThat(member.getStatus()).isEqualTo(MemberStatus.ACTIVE);
-        assertThat(member.getMaxLoanCount()).isEqualTo(5);
-        assertThat(member.getMemberNumber()).startsWith("M");
-        assertThat(member.getMemberNumber()).hasSize(10);
-    }
-
-    @Test
-    @DisplayName("추가 대출 가능 여부를 올바르게 판단해야 한다")
-    void canLoanMore_ShouldReturnCorrectResult() {
-        // given
-        Member member = createTestMember();
-        
-        // 현재 5권 대출 중 (최대 대출 권수)
-        for (int i = 0; i < 5; i++) {
-            Loan loan = createActiveLoan(member);
-            member.getLoans().add(loan);
-        }
-        
-        // when & then
-        assertThat(member.canLoanMore()).isFalse();
-    }
-
-    @Test
-    @DisplayName("연체 도서 보유 여부를 올바르게 판단해야 한다")
-    void hasOverdueLoans_ShouldReturnTrue_WhenOverdueLoansExist() {
-        // given
-        Member member = createTestMember();
-        Loan overdueLoan = createOverdueLoan(member);
-        member.getLoans().add(overdueLoan);
-        
-        // when & then
-        assertThat(member.hasOverdueLoans()).isTrue();
-    }
-}
-```
-
-### 10.2 Repository 테스트
-```java
+// EntityIntegrityTest.java
 @DataJpaTest
-@DisplayName("LoanRepository 테스트")
-class LoanRepositoryTest {
+@ActiveProfiles("prod")
+class EntityIntegrityTest {
 
-    @Autowired
-    private TestEntityManager entityManager;
-
-    @Autowired
-    private LoanRepository loanRepository;
+    @Autowired private ProjectRepository projectRepository;
+    @Autowired private DiaryRepository diaryRepository;
+    @Autowired private TagRepository tagRepository;
+    @Autowired private DiaryTagRepository diaryTagRepository;
 
     @Test
-    @DisplayName("회원 ID와 상태로 대출 목록을 조회해야 한다")
-    void findByMemberIdAndStatus_ShouldReturnLoans() {
-        // given
-        Member member = createAndSaveMember();
-        Book book = createAndSaveBook();
-        Loan loan = createAndSaveLoan(member, book, LoanStatus.BORROWED);
-        
-        // when
-        List<Loan> result = loanRepository.findByMemberIdAndStatus(
-            member.getId(), LoanStatus.BORROWED);
-        
-        // then
-        assertThat(result).hasSize(1);
-        assertThat(result.get(0).getId()).isEqualTo(loan.getId());
+    @DisplayName("Diary의 날짜가 null이면 저장 실패")
+    void diary_date_null_예외() {
+        Project project = new Project("무결성 테스트");
+        projectRepository.save(project);
+
+        Diary diary = Diary.builder()
+                .date(null)
+                .devfeel("내용")
+                .project(project)
+                .build();
+
+        assertThrows(DataIntegrityViolationException.class, () -> {
+            diaryRepository.saveAndFlush(diary);
+        });
     }
 
     @Test
-    @DisplayName("연체된 대출 목록을 조회해야 한다")
-    void findOverdueLoans_ShouldReturnOverdueLoans() {
-        // given
-        Member member = createAndSaveMember();
-        Book book = createAndSaveBook();
-        Loan overdueLoan = createAndSaveLoan(member, book, LoanStatus.BORROWED);
-        
-        // 반납예정일을 과거로 설정
-        overdueLoan.setDueDate(LocalDate.now().minusDays(1));
-        entityManager.persistAndFlush(overdueLoan);
-        
-        // when
-        List<Loan> result = loanRepository.findOverdueLoans();
-        
-        // then
-        assertThat(result).hasSize(1);
-        assertThat(result.get(0).isOverdue()).isTrue();
+    @DisplayName("Project 이름이 null이면 저장 실패")
+    void project_name_null_예외() {
+        Project project = new Project(null);
+
+        assertThrows(DataIntegrityViolationException.class, () -> {
+            projectRepository.saveAndFlush(project);
+        });
+    }
+
+    @Test
+    @DisplayName("Tag 이름 중복 시 저장 실패")
+    void tag_name_duplicate_예외() {
+        Tag tag1 = Tag.builder().name("중복태그").build();
+        Tag tag2 = Tag.builder().name("중복태그").build();
+
+        tagRepository.save(tag1);
+
+        assertThrows(DataIntegrityViolationException.class, () -> {
+            tagRepository.saveAndFlush(tag2);
+        });
+    }
+
+    @Test
+    @DisplayName("DiaryTag의 diary가 null이면 저장 실패")
+    void diarytag_diary_null_예외() {
+        Tag tag = Tag.builder().name("태그1").build();
+        tagRepository.save(tag);
+
+        DiaryTag diaryTag = DiaryTag.builder()
+                .diary(null)
+                .tag(tag)
+                .build();
+
+        assertThrows(DataIntegrityViolationException.class, () -> {
+            diaryTagRepository.saveAndFlush(diaryTag);
+        });
+    }
+
+    @Test
+    @DisplayName("DiaryTag의 tag가 null이면 저장 실패")
+    void diarytag_tag_null_예외() {
+        Project project = new Project("태그 null 테스트");
+        projectRepository.save(project);
+
+        Diary diary = Diary.builder()
+                .date(LocalDate.now())
+                .project(project)
+                .devfeel("기분")
+                .build();
+        diaryRepository.save(diary);
+
+        DiaryTag diaryTag = DiaryTag.builder()
+                .diary(diary)
+                .tag(null)
+                .build();
+
+        assertThrows(DataIntegrityViolationException.class, () -> {
+            diaryTagRepository.saveAndFlush(diaryTag);
+        });
     }
 }
 ```
-
----
-
-## 11. 성능 모니터링
-
-### 11.1 쿼리 성능 모니터링
-```properties
-# application.properties - 쿼리 성능 모니터링 설정
-
-# 로깅 레벨 설정
-logging.level.org.hibernate.SQL=DEBUG
-logging.level.org.hibernate.type.descriptor.sql.BasicBinder=TRACE
-logging.level.org.hibernate.stat=DEBUG
-logging.level.org.springframework.jdbc.core=DEBUG
-
-# DB 접속정보
-spring.datasource.url=jdbc:mariadb://localhost:3306/library_db
-spring.datasource.username=lab
-spring.datasource.password=lab
-spring.datasource.driverClassName=org.mariadb.jdbc.Driver
-
-# JPA 및 Hibernate 설정
-spring.jpa.show-sql=true
-spring.jpa.properties.hibernate.format_sql=true
-spring.jpa.properties.hibernate.use_sql_comments=true
-spring.jpa.properties.hibernate.generate_statistics=true
-spring.jpa.properties.hibernate.session.events.log.LOG_QUERIES_SLOWER_THAN_MS=1000
-
-# 하이버네이트 통계 정보 활성화
-spring.jpa.properties.hibernate.stats.enabled=true
-spring.jpa.properties.hibernate.cache.use_second_level_cache=false
-spring.jpa.properties.hibernate.cache.use_query_cache=false
-
-# 배치 처리 최적화
-spring.jpa.properties.hibernate.jdbc.batch_size=50
-spring.jpa.properties.hibernate.order_inserts=true
-spring.jpa.properties.hibernate.order_updates=true
-spring.jpa.properties.hibernate.jdbc.batch_versioned_data=true
-
-# 커넥션 풀 설정 (HikariCP)
-spring.datasource.hikari.maximum-pool-size=20
-spring.datasource.hikari.minimum-idle=5
-spring.datasource.hikari.connection-timeout=20000
-spring.datasource.hikari.idle-timeout=300000
-spring.datasource.hikari.max-lifetime=1200000
-spring.datasource.hikari.leak-detection-threshold=60000
-
-# 1초 이상 걸리는 쿼리 자동 감지
-spring.jpa.properties.hibernate.session.events.log.LOG_QUERIES_SLOWER_THAN_MS=1000
-
-# 개발환경용 추가 설정
-spring.jpa.properties.hibernate.highlight_sql=true
-spring.jpa.properties.hibernate.type=trace
-```
-
-### 11.1.1 환경별 설정
-
-**개발환경 (application-dev.properties)**
-```properties
-# 개발환경 - 상세한 로깅 및 디버깅
-logging.level.org.hibernate.SQL=DEBUG
-logging.level.org.hibernate.type.descriptor.sql.BasicBinder=TRACE
-logging.level.com.library=DEBUG
-
-spring.jpa.show-sql=true
-spring.jpa.properties.hibernate.format_sql=true
-spring.jpa.properties.hibernate.use_sql_comments=true
-spring.jpa.properties.hibernate.generate_statistics=true
-
-# H2 Console 활성화 (개발용)
-spring.h2.console.enabled=true
-spring.h2.console.path=/h2-console
-```
-
-**테스트환경 (application-test.properties)**
-```properties
-# 테스트환경 - 최소한의 로깅
-logging.level.org.hibernate.SQL=INFO
-spring.jpa.show-sql=false
-spring.jpa.properties.hibernate.format_sql=false
-
-# 테스트 데이터베이스 설정
-spring.datasource.url=jdbc:h2:mem:testdb
-spring.jpa.hibernate.ddl-auto=create-drop
-```
-
-**운영환경 (application-prod.properties)**
-```properties
-# 운영환경 - 성능 최적화 중심
-logging.level.org.hibernate.SQL=WARN
-logging.level.org.hibernate.type.descriptor.sql.BasicBinder=WARN
-spring.jpa.show-sql=false
-
-# 운영 최적화 설정
-spring.jpa.properties.hibernate.format_sql=false
-spring.jpa.properties.hibernate.use_sql_comments=false
-spring.jpa.properties.hibernate.generate_statistics=true
-
-# 커넥션 풀 최적화
-spring.datasource.hikari.maximum-pool-size=50
-spring.datasource.hikari.minimum-idle=10
-spring.datasource.hikari.connection-timeout=30000
-
-```
-
-### 11.2 슬로우 쿼리 감지
+### 6.1 Repository 테스트
 ```java
-@Component
-@Slf4j
-public class QueryPerformanceInterceptor implements Interceptor {
-    
-    private static final long SLOW_QUERY_THRESHOLD = 1000; // 1초
-    
-    @Override
-    public boolean onLoad(Object entity, Serializable id, Object[] state, 
-                         String[] propertyNames, Type[] types) {
-        long startTime = System.currentTimeMillis();
-        
-        return new Runnable() {
-            @Override
-            public void run() {
-                long endTime = System.currentTimeMillis();
-                long executionTime = endTime - startTime;
-                
-                if (executionTime > SLOW_QUERY_THRESHOLD) {
-                    log.warn("슬로우 쿼리 감지: {}ms, Entity: {}, ID: {}", 
-                            executionTime, entity.getClass().getSimpleName(), id);
-                }
-            }
-        };
+// DiaryRepositoryTest.java
+@DataJpaTest
+@ActiveProfiles("prod") // MariaDB 실제 설정 사용
+class DiaryRepositoryTest {
+
+
+    @Autowired
+    private DiaryRepository diaryRepository;
+
+    @Autowired
+    private ProjectRepository projectRepository;
+
+    @Test
+    @DisplayName("프로젝트로 일기 목록 조회")
+    void findByProject_성공() {
+        // given
+        Project project = new Project("테스트 프로젝트");
+        projectRepository.save(project);
+
+        Diary diary = new Diary(LocalDate.now(), "테스트 내용", project);
+        diaryRepository.save(diary);
+
+        // when
+        List<Diary> diaries = diaryRepository.findByProject(project);
+
+        // then
+        assertThat(diaries).hasSize(1);
+        assertThat(diaries.get(0).getDevfeel()).isEqualTo("테스트 내용");
+    }
+
+    @Test
+    @DisplayName("날짜 범위로 일기 조회")
+    void findByDateBetween_성공() {
+        // given
+        Project project = new Project("범위 테스트");
+        projectRepository.save(project);
+
+        Diary diary1 = new Diary(LocalDate.of(2024, 1, 1), "일기1", project);
+        Diary diary2 = new Diary(LocalDate.of(2024, 1, 5), "일기2", project);
+        diaryRepository.saveAll(List.of(diary1, diary2));
+
+        // when
+        List<Diary> results = diaryRepository.findByDateBetween(
+                LocalDate.of(2024, 1, 1),
+                LocalDate.of(2024, 1, 10)
+        );
+
+        // then
+        assertThat(results).hasSize(2);
+    }
+
+    @Test
+    @DisplayName("날짜가 null인 경우 저장 실패 (무결성 검증)")
+    void date가_null이면_예외발생() {
+        // given
+        Project project = new Project("무결성 테스트");
+        projectRepository.save(project);
+
+        Diary diary = new Diary(null, "내용", project); // 날짜 null
+
+        // when & then
+        assertThrows(DataIntegrityViolationException.class, () -> {
+            diaryRepository.saveAndFlush(diary);
+        });
+    }
+}
+
+// DiaryTagRepositoryTest.java
+@DataJpaTest
+@ActiveProfiles("prod")
+class DiaryTagRepositoryTest {
+
+    @Autowired
+    private DiaryTagRepository diaryTagRepository;
+
+    @Autowired
+    private DiaryRepository diaryRepository;
+
+    @Autowired
+    private ProjectRepository projectRepository;
+
+    @Autowired
+    private TagRepository tagRepository;
+
+    @Test
+    @DisplayName("특정 태그로 DiaryTag 목록 조회")
+    void findByTag_성공() {
+        // given
+        Project project = new Project("다이어리 태그 테스트");
+        projectRepository.save(project);
+
+        Diary diary = Diary.builder()
+                .date(LocalDate.now())
+                .project(project)
+                .devfeel("기분 좋음")
+                .build();
+        diaryRepository.save(diary);
+
+        Tag tag = Tag.builder()
+                .name("테스트 태그")
+                .build();
+        tagRepository.save(tag);
+
+        DiaryTag diaryTag = DiaryTag.builder()
+                .diary(diary)
+                .tag(tag)
+                .build();
+        diaryTagRepository.save(diaryTag);
+
+        // when
+        List<DiaryTag> result = diaryTagRepository.findByTag(tag);
+
+        // then
+        assertThat(result).hasSize(1);
+        assertThat(result.get(0).getTag().getName()).isEqualTo("테스트 태그");
+        assertThat(result.get(0).getDiary().getDevfeel()).isEqualTo("기분 좋음");
+    }
+}
+
+// ProjectRepositoryTest.java
+@DataJpaTest
+@ActiveProfiles("prod")
+class ProjectRepositoryTest {
+
+    @Autowired
+    private ProjectRepository projectRepository;
+
+    @Test
+    @DisplayName("프로젝트 이름으로 조회 성공")
+    void findByName_성공() {
+        // given
+        Project project = new Project("개발일지 프로젝트");
+        projectRepository.save(project);
+
+        // when
+        Optional<Project> result = projectRepository.findByName("개발일지 프로젝트");
+
+        // then
+        assertThat(result).isPresent();
+        assertThat(result.get().getName()).isEqualTo("개발일지 프로젝트");
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 프로젝트 이름 조회시 빈 Optional 반환")
+    void findByName_실패() {
+        // when
+        Optional<Project> result = projectRepository.findByName("없는 프로젝트");
+
+        // then
+        assertThat(result).isNotPresent();
+    }
+}
+
+// TagRepositoryTest.java
+@DataJpaTest
+@ActiveProfiles("prod")
+class TagRepositoryTest {
+
+    @Autowired
+    private TagRepository tagRepository;
+
+    @Test
+    @DisplayName("태그 이름으로 조회 성공")
+    void findByName_성공() {
+        // given
+        Tag tag = Tag.builder()
+                .name("Spring")
+                .build();
+        tagRepository.save(tag);
+
+        // when
+        Optional<Tag> result = tagRepository.findByName("Spring");
+
+        // then
+        assertThat(result).isPresent();
+        assertThat(result.get().getName()).isEqualTo("Spring");
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 태그 이름 조회시 빈 Optional 반환")
+    void findByName_실패() {
+        // when
+        Optional<Tag> result = tagRepository.findByName("NonExistentTag");
+
+        // then
+        assertThat(result).isNotPresent();
     }
 }
 ```
 
 ---
 
-## 12. 체크리스트 및 검토 항목
+## 7. 성능 모니터링
 
-### 12.1 설계 완성도 체크리스트
-```
-□ 모든 Entity에 @Entity 어노테이션이 적용되었는가?
-□ 테이블명과 컬럼명이 명명 규칙을 따르는가?
-□ Primary Key 전략이 일관되게 적용되었는가?
-□ 필요한 인덱스가 모두 정의되었는가?
-□ 연관관계 매핑이 올바르게 설정되었는가?
-□ 비즈니스 메서드가 Entity에 포함되었는가?
-□ 감사(Auditing) 기능이 적용되었는가?
-□ 성능 최적화가 고려되었는가?
-□ 검증 어노테이션이 적절히 사용되었는가?
-```
+### 7.1 쿼리 성능 로깅 설정
+```yaml
+# application.yml 공통 설정
 
-### 12.2 코드 품질 체크리스트
-```
-□ 모든 필드에 적절한 접근 제어자가 설정되었는가?
-□ 불변 객체 원칙이 최대한 적용되었는가?
-□ 생성자와 팩토리 메서드가 적절히 구현되었는가?
-□ 예외 처리가 비즈니스 메서드에 포함되었는가?
-□ 코드 중복이 최소화되었는가?
-□ 주석과 문서화가 충분한가?
-□ 테스트 코드가 작성되었는가?
-□ 코딩 컨벤션이 일관되게 적용되었는가?
+logging:
+  level:
+    org.hibernate.SQL: debug  # 실행되는 SQL 쿼리 로그
+    org.hibernate.type.descriptor.sql.BasicBinder: trace  # 바인딩 파라미터 로그
+
+spring:
+  jpa:
+    show-sql: true  # SQL 출력 활성화
+
 ```
 
-### 12.3 성능 체크리스트
+### 7.2 개발환경 상세 설정
+
+```yaml
+# application-dev.yml
+
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    database-platform: org.hibernate.dialect.MySQLDialect
+    properties:
+      hibernate:
+        format_sql: true  # 보기 좋게 정렬된 SQL 출력
+        use_sql_comments: true  # 쿼리에 주석 포함
+        generate_statistics: true  # 하이버네이트 통계 활성화
+        jdbc:
+          batch_size: 50  # 배치 처리 크기
+          batch_versioned_data: true
+        order_inserts: true
+        order_updates: true
+
+logging:
+  level:
+    root: debug
+    com.devdiary: debug
+    org.hibernate.SQL: debug
+    org.hibernate.type.descriptor.sql.BasicBinder: trace
+
 ```
-□ N+1 쿼리 문제가 해결되었는가?
-□ 적절한 페치 전략(LAZY/EAGER)이 적용되었는가?
-□ 필요한 인덱스가 모두 생성되었는가?
-□ 쿼리 최적화가 적용되었는가?
-□ 데이터베이스 커넥션 풀이 적절히 설정되었는가?
+
+### 7.3 테스트 환경 최소 설정
+```yaml
+# application-test.yml
+
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    database-platform: org.hibernate.dialect.H2Dialect
+
+logging:
+  level:
+    root: warn
+    com.devdiary: info
+    org.hibernate.SQL: info
+
 ```
----
 
-## 14. 마무리
+### 7.4 운영환경 성능 위주 설정
+```yaml
+# application-prod.yml
 
-### 14.1 주요 포인트 요약
-1. **도메인 중심 설계**: 비즈니스 로직을 Entity에 캡슐화
-2. **성능 최적화**: 인덱스, 페치 전략, 쿼리 최적화 고려
-3. **일관된 규칙**: 명명 규칙, 어노테이션 사용법 통일
-4. **검증 및 제약조건**: 데이터 무결성 보장
-5. **테스트 가능성**: 단위 테스트와 통합 테스트 고려
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: create
+    show-sql: true
+    database-platform: org.hibernate.dialect.MariaDBDialect
+    properties:
+      hibernate:
+        generate_statistics: true
+        jdbc:
+          batch_size: 50
+          batch_versioned_data: true
+        order_inserts: true
+        order_updates: true
 
+logging:
+  level:
+    root: warn
+    com.example.myapp: info
+    org.hibernate.SQL: debug
+    org.hibernate.type.descriptor.sql.BasicBinder: trace
+
+```
 ---
