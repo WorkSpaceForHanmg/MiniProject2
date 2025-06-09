@@ -1,39 +1,36 @@
-```plaintext
-개발일기 백엔드 API 서버 🖥️
-개발일기 웹앱의 백엔드 서버입니다.
+# 개발일기 백엔드 API 서버 🖥️
+
+개발일기 웹앱의 백엔드 서버입니다.  
 Spring Boot와 JPA 기반으로 일기, 프로젝트, 태그 데이터를 관리하는 RESTful API를 제공합니다.
 
-🚀 주요 기능
-일기 관리: 개발 일기 생성, 조회, 수정, 삭제
+---
 
-프로젝트 관리: 프로젝트 정보 CRUD
+## 🚀 주요 기능
 
-태그 관리: 태그 생성 및 조회
+- **일기 관리**: 개발 일기 생성, 조회, 수정, 삭제
+- **프로젝트 관리**: 프로젝트 정보 CRUD
+- **태그 관리**: 태그 생성 및 조회
+- **일기-태그 연동**: 일기별 태그 매핑 관리
+- **DTO와 Entity 매핑**: 데이터 전송 객체와 DB 엔티티 간 변환
+- **서비스 계층**: 비즈니스 로직 처리
+- **레포지토리 계층**: 데이터베이스 접근 및 쿼리 수행
 
-일기-태그 연동: 일기별 태그 매핑 관리
+---
 
-DTO와 Entity 매핑: 데이터 전송 객체와 DB 엔티티 간 변환
+## 🛠️ 기술 스택
 
-서비스 계층: 비즈니스 로직 처리
+- **Backend**: Java 17+
+- **프레임워크**: Spring Boot 3.x
+- **데이터 접근**: Spring Data JPA (Hibernate)
+- **DB**: MariaDB (또는 다른 관계형 DB)
+- **빌드 도구**: Maven 또는 Gradle
+- **기타**: Lombok, MapStruct (매퍼 사용 시)
 
-레포지토리 계층: 데이터베이스 접근 및 쿼리 수행
+---
 
-🛠️ 기술 스택
-Backend: Java 17+
+## 📁 프로젝트 구조
 
-프레임워크: Spring Boot 3.x
-
-데이터 접근: Spring Data JPA (Hibernate)
-
-DB: MariaDB (또는 다른 관계형 DB)
-
-빌드 도구: Maven 또는 Gradle
-
-기타: Lombok, MapStruct (매퍼 사용 시)
-
-📁 프로젝트 구조
-bash
-복사
+```plaintext
 src/main/java/com/example/diarybackend/
 ├── controller/           # REST API 컨트롤러 (DiaryController, ProjectController, TagController)
 ├── dto/                  # 데이터 전송 객체 (DiaryDTO, ProjectDTO, TagDTO 등)
@@ -42,12 +39,13 @@ src/main/java/com/example/diarybackend/
 ├── repository/           # 데이터 접근 계층 (DiaryRepository, ProjectRepository 등)
 ├── service/              # 비즈니스 로직 처리 (DiaryService, ProjectService 등)
 └── service/impl/         # 서비스 구현체 (ProjectServiceImpl 등)
-🏃‍♂️ 설치 및 실행
-1. 저장소 클론
-   bash
-   복사
-   git clone <repository-url>
-   cd diary-backend
+
+# 🏃‍♂️ 설치 및 실행
+
+1. 저장소 클론  
+```bash
+git clone <repository-url>
+cd diary-backend
 2. 데이터베이스 설정
    MariaDB 또는 원하는 DB를 설치 및 실행 후,
    application.yml 또는 application.properties 에서 접속 정보 설정
