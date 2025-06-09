@@ -1,3 +1,4 @@
+```plaintext
 개발일기 백엔드 API 서버 🖥️
 개발일기 웹앱의 백엔드 서버입니다.
 Spring Boot와 JPA 기반으로 일기, 프로젝트, 태그 데이터를 관리하는 RESTful API를 제공합니다.
