@@ -1,6 +1,7 @@
 package com.basic.myspringbootapp.controller;
 
 import com.basic.myspringbootapp.dto.DiaryDTO;
+import com.basic.myspringbootapp.dto.SimpleResponse;
 import com.basic.myspringbootapp.entity.Diary;
 import com.basic.myspringbootapp.entity.Project;
 import com.basic.myspringbootapp.mapper.DiaryMapper;
@@ -28,8 +29,8 @@ public class DiaryController {
 
     // 전체 일기 조회
     @GetMapping
-    public ResponseEntity<List<DiaryDTO.SimpleResponse>> getAllDiaries() {
-        List<DiaryDTO.SimpleResponse> responseList = diaryService.findAllDiaries().stream()
+    public ResponseEntity<List<SimpleResponse>> getAllDiaries() {
+        List<SimpleResponse> responseList = diaryService.findAllDiaries().stream()
                 .map(DiaryMapper::entityToSimpleDto)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(responseList);
@@ -45,13 +46,13 @@ public class DiaryController {
 
     // 프로젝트별 일기 조회
     @GetMapping("/project/{pid}")
-    public ResponseEntity<List<DiaryDTO.SimpleResponse>> getDiariesByProject(@PathVariable Long pid) {
+    public ResponseEntity<List<SimpleResponse>> getDiariesByProject(@PathVariable Long pid) {
         Project project = projectService.getProjectById(pid);
         if (project == null) {
             return ResponseEntity.notFound().build();
         }
 
-        List<DiaryDTO.SimpleResponse> responseList = diaryService.findDiariesByProject(project).stream()
+        List<SimpleResponse> responseList = diaryService.findDiariesByProject(project).stream()
                 .map(DiaryMapper::entityToSimpleDto)
                 .collect(Collectors.toList());
 
@@ -60,11 +61,11 @@ public class DiaryController {
 
     // 날짜 범위로 일기 조회
     @GetMapping("/range")
-    public ResponseEntity<List<DiaryDTO.SimpleResponse>> getDiariesByDateRange(
+    public ResponseEntity<List<SimpleResponse>> getDiariesByDateRange(
             @RequestParam("start") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam("end") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
 
-        List<DiaryDTO.SimpleResponse> responseList = diaryService.findDiariesByDateRange(startDate, endDate).stream()
+        List<SimpleResponse> responseList = diaryService.findDiariesByDateRange(startDate, endDate).stream()
                 .map(DiaryMapper::entityToSimpleDto)
                 .collect(Collectors.toList());
 

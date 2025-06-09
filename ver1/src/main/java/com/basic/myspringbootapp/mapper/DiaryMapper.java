@@ -2,6 +2,7 @@ package com.basic.myspringbootapp.mapper;
 
 import com.basic.myspringbootapp.dto.DiaryDTO;
 import com.basic.myspringbootapp.dto.ProjectDTO;
+import com.basic.myspringbootapp.dto.SimpleResponse;
 import com.basic.myspringbootapp.entity.Diary;
 import com.basic.myspringbootapp.entity.Project;
 
@@ -42,10 +43,10 @@ public class DiaryMapper {
     }
 
     // Entity → 간단 DTO 변환
-    public static DiaryDTO.SimpleResponse entityToSimpleDto(Diary entity) {
+    public static SimpleResponse entityToSimpleDto(Diary entity) {
         if (entity == null) return null;
 
-        return DiaryDTO.SimpleResponse.builder()
+        return SimpleResponse.builder()
                 .did(entity.getDid())
                 .date(entity.getDate())
                 .title(entity.getDevfeel())

@@ -46,13 +46,4 @@ public class DiaryDTO {
         private ProjectDTO.SimpleResponse project;
     }
 
-    @Data
-    @NoArgsConstructor
-    @AllArgsConstructor
-    @Builder
-    public static class SimpleResponse {
-        private Long did;
-        private LocalDate date;
-        private String title;  // devfeel
-    }
 }

@@ -13,7 +13,7 @@ public class DiaryTagDTO {
     @Builder
     public static class Response {
         private Long dtid;
-        private DiaryDTO.SimpleResponse diary;
+        private SimpleResponse diary;
         private TagDTO.SimpleResponse tag;
     }
 
