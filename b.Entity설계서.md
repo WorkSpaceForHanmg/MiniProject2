@@ -548,24 +548,20 @@ spring:
 ### 7.2 개발환경 상세 설정
 
 ```yaml
-# application-dev.yml
+myboot:
+  name: Dev Env
 
 spring:
+  datasource:
+    url: jdbc:mariadb://127.0.0.1:3306/boot_db
+    username: Host
+    password: maria
+    driver-class-name: org.mariadb.jdbc.Driver
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: update   # dev는 보통 update (create는 데이터 날아감)
     show-sql: true
-    database-platform: org.hibernate.dialect.MySQLDialect
-    properties:
-      hibernate:
-        format_sql: true  # 보기 좋게 정렬된 SQL 출력
-        use_sql_comments: true  # 쿼리에 주석 포함
-        generate_statistics: true  # 하이버네이트 통계 활성화
-        jdbc:
-          batch_size: 50  # 배치 처리 크기
-          batch_versioned_data: true
-        order_inserts: true
-        order_updates: true
+    database-platform: org.hibernate.dialect.MariaDBDialect
 
 logging:
   level:
@@ -573,6 +569,11 @@ logging:
     com.devdiary: debug
     org.hibernate.SQL: debug
     org.hibernate.type.descriptor.sql.BasicBinder: trace
+  file:
+    name: logs/dev.log
+  pattern:
+    console: "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} %-5level %logger{36} - %msg%n"
 
 ```
 
@@ -604,26 +605,49 @@ logging:
 # application-prod.yml
 
 spring:
-  jpa:
-    hibernate:
-      ddl-auto: create
-    show-sql: true
-    database-platform: org.hibernate.dialect.MariaDBDialect
-    properties:
-      hibernate:
-        generate_statistics: true
-        jdbc:
-          batch_size: 50
-          batch_versioned_data: true
-        order_inserts: true
-        order_updates: true
+  application:
+    name: MySpringBootApp
+
+  profiles:
+    active: prod
+
+  datasource:
+    url: jdbc:mariadb://127.0.0.1:3306/devdiary
+    username: root
+    password: maria
+
+    driver-class-name: org.mariadb.jdbc.Driver
+  boot:
+    admin:
+      client:
+        url: http://localhost:8090
+
+  sql:
+    init:
+      mode: NEVER
+      schema-locations: classpath:schema.sql
+      data-locations: classpath:data.sql
+
+server:
+  port: 8085
 
 logging:
   level:
-    root: warn
-    com.example.myapp: info
-    org.hibernate.SQL: debug
-    org.hibernate.type.descriptor.sql.BasicBinder: trace
+    root: info
+    com.devdiary: debug
+  file:
+    path: logs
+    name: devdiary.log
+  pattern:
+    console: "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} %-5level %logger{36} - %msg%n"
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+
 
 ```
 ---
