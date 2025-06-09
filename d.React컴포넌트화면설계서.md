@@ -56,7 +56,9 @@
 - **화면 타입**: [x] 목록 화면 [x] 대시보드
 - **권한 레벨**: [x] 로그인 필요
 
-![image](https://github.com/user-attachments/assets/87207f5f-95cc-4023-b15f-0b844070fc66)
+### 화면 캡쳐
+
+![image](https://github.com/user-attachments/assets/64c01139-01f9-4b45-a519-c7e7ad535d21)
 
 ---
 
@@ -112,6 +114,9 @@
 #### 화면 분류
 - **화면 타입**: [x] 상세 화면
 - **권한 레벨**: [x] 로그인 필요
+
+### 화면 캡쳐
+![image](https://github.com/user-attachments/assets/a17a91f7-c506-472b-959c-6bfe8ac5851d)
 
 ---
 
@@ -180,6 +185,9 @@
 - **화면 타입**: [x] 입력 화면
 - **권한 레벨**: [x] 로그인 필요
 
+### 화면 캡쳐
+![image](https://github.com/user-attachments/assets/28c1e6f2-de3d-4006-9e22-23a5b2b17df3)
+
 ---
 
 ## 4. ErrorNote (오답노트) 화면
@@ -236,5 +244,8 @@
 #### 화면 분류
 - **화면 타입**: [x] 목록 화면
 - **권한 레벨**: [x] 로그인 필요
+
+### 화면 캡쳐
+![image](https://github.com/user-attachments/assets/d1779a6c-598b-4442-8a21-2dc9b677b765)
 
 ---
