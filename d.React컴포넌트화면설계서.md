@@ -56,6 +56,8 @@
 - **화면 타입**: [x] 목록 화면 [x] 대시보드
 - **권한 레벨**: [x] 로그인 필요
 
+![image](https://github.com/user-attachments/assets/87207f5f-95cc-4023-b15f-0b844070fc66)
+
 ---
 
 ## 2. DetailPage (일기 상세) 화면
