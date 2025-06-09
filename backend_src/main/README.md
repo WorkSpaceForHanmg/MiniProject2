@@ -40,17 +40,17 @@ src/main/java/com/example/diarybackend/
 ├── service/              # 비즈니스 로직 처리 (DiaryService, ProjectService 등)
 └── service/impl/         # 서비스 구현체 (ProjectServiceImpl 등)
 
-# 🏃‍♂️ 설치 및 실행
+## 🏃‍♂️ 설치 및 실행
 
-1. 저장소 클론  
+###1. 저장소 클론  
 ```bash
 git clone <repository-url>
 cd diary-backend
-2. 데이터베이스 설정
+###2. 데이터베이스 설정
    MariaDB 또는 원하는 DB를 설치 및 실행 후,
    application.yml 또는 application.properties 에서 접속 정보 설정
 
-3. 의존성 설치 및 빌드
+###3. 의존성 설치 및 빌드
    Maven 또는 Gradle 빌드
 
 bash
@@ -64,7 +64,8 @@ bash
    ./mvnw spring-boot:run
 # 또는
 ./gradlew bootRun
-📜 주요 API 엔드포인트
+
+##📜 주요 API 엔드포인트
 메서드	URI	설명
 GET	/api/diaries	모든 일기 조회
 POST	/api/diaries	새 일기 작성
@@ -75,7 +76,7 @@ GET	/api/projects	프로젝트 목록 조회
 POST	/api/projects	새 프로젝트 생성
 GET	/api/tags	태그 목록 조회
 
-📊 데이터 모델
+##📊 데이터 모델
 Diary (일기)
 id (Long): 일기 ID
 
@@ -110,7 +111,7 @@ diary (Diary): 일기
 
 tag (Tag): 태그
 
-🛠️ 주요 컴포넌트
+###🛠️ 주요 컴포넌트
 DiaryController: 일기 관련 REST API 처리
 
 ProjectController: 프로젝트 API 처리
@@ -125,7 +126,7 @@ Mapper 클래스: DTO와 Entity 변환 처리
 
 Repository 인터페이스: JPA 기반 데이터 접근
 
-🔧 사용 예시 (curl)
+##🔧 사용 예시 (curl)
 모든 일기 조회
 
 bash
